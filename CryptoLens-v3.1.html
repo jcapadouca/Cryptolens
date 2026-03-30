@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#040c18">
+<title>CryptoLens v3.1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg0:#040c18;--bg1:#071220;--bg2:#0c1c30;--bg3:#112240;--bg4:#162d50;
+  --b0:rgba(30,100,200,.1);--b1:rgba(30,100,200,.25);--b2:rgba(30,100,200,.5);
+  --acc:#1d6fd8;--acc2:#3b8ef0;--acc3:#6db3ff;
+  --cyan:#00d4ff;--green:#00e676;--green2:rgba(0,230,118,.12);
+  --red:#ff3d57;--red2:rgba(255,61,87,.12);
+  --yellow:#ffd740;--yellow2:rgba(255,215,64,.12);
+  --purple:#b388ff;--orange:#ff9100;
+  --newton:#00e676;--newtonDim:rgba(0,230,118,.1);
+  --cdotcom:#0033ad;--cdotcomBright:#4d7cff;--cdotcomDim:rgba(77,124,255,.1);
+  --t0:#e8f4ff;--t1:#7aacdc;--t2:#3d6b99;
+  --mono:'JetBrains Mono',monospace;--sans:'Outfit',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg0);color:var(--t0);font-family:var(--sans);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(30,100,200,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(30,100,200,.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(29,111,216,.15),transparent);pointer-events:none;z-index:0;}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:100;background:rgba(4,12,24,.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:14px;padding:0 16px;height:56px;}
+.logo{display:flex;align-items:center;gap:7px;font-family:var(--sans);font-weight:800;font-size:15px;background:linear-gradient(90deg,var(--acc3),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;flex-shrink:0;}
+nav{display:flex;gap:2px;flex:1;justify-content:center;}
+.nb{background:none;border:none;color:var(--t2);font-family:var(--sans);font-weight:600;font-size:10px;letter-spacing:.5px;text-transform:uppercase;padding:5px 9px;border-radius:6px;cursor:pointer;transition:all .2s;}
+.nb:hover{color:var(--t1);background:var(--bg3);}
+.nb.active{color:var(--acc3);background:rgba(29,111,216,.12);border:1px solid var(--b1);}
+.header-r{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.wpill{background:var(--bg3);border:1px solid var(--b1);border-radius:20px;padding:3px 9px;font-family:var(--mono);font-size:10px;color:var(--acc3);display:flex;align-items:center;gap:5px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pdot 2s infinite;}
+@keyframes pdot{0%,100%{opacity:1}50%{opacity:.3}}
+.rbtn{background:var(--bg3);border:1px solid var(--b1);color:var(--t1);font-family:var(--mono);font-size:10px;padding:5px 8px;border-radius:6px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:4px;}
+.rbtn:hover{border-color:var(--acc2);color:var(--acc3);}
+.rbtn.spin .si{animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* PAGES */
+.page{display:none;padding:16px;position:relative;z-index:1;}.page.active{display:block;}
+.stitle{font-family:var(--mono);font-size:10px;color:var(--t2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--b0);display:flex;align-items:center;gap:8px;}
+.stitle::before{content:'';width:2px;height:12px;background:var(--acc2);border-radius:2px;}
+
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;}
+@media(max-width:700px){.g2,.g3,.g4{grid-template-columns:1fr 1fr;}nav{display:none;}}
+@media(max-width:480px){.g2,.g3,.g4{grid-template-columns:1fr;}}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--b0);border-radius:12px;padding:14px;}
+.card-label{font-family:var(--mono);font-size:9px;color:var(--t2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;}
+.card-value{font-family:var(--mono);font-size:20px;font-weight:700;}
+.card-sub{font-family:var(--mono);font-size:9px;color:var(--t2);margin-top:3px;}
+
+/* EXCHANGE HEADER BADGES */
+.ex-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.ex-badge{font-family:var(--mono);font-size:10px;font-weight:700;padding:5px 12px;border-radius:6px;letter-spacing:.5px;}
+.ex-newton{background:var(--newtonDim);color:var(--newton);border:1px solid rgba(0,230,118,.3);}
+.ex-cdotcom{background:var(--cdotcomDim);color:var(--cdotcomBright);border:1px solid rgba(77,124,255,.3);}
+
+/* DUAL WALLET DISPLAY */
+.dual-wallets{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.wallet-panel{background:var(--bg2);border:1px solid var(--b0);border-radius:12px;padding:14px;}
+.wallet-panel.newton-panel{border-top:2px solid var(--newton);}
+.wallet-panel.cdotcom-panel{border-top:2px solid var(--cdotcomBright);}
+.wp-name{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.wp-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.wp-lbl{font-family:var(--mono);font-size:9px;color:var(--t2);}
+.wp-val{font-family:var(--mono);font-size:12px;font-weight:700;}
+
+/* COIN CARDS */
+.coins-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:16px;}
+.coin-card{background:var(--bg2);border:1px solid var(--b0);border-radius:12px;padding:14px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden;}
+.coin-card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--b2),transparent);opacity:0;transition:opacity .3s;}
+.coin-card:hover{border-color:var(--b1);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.4);}
+.coin-card:hover::after{opacity:1;}
+.cc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.cc-id{display:flex;align-items:center;gap:8px;}
+.cc-icon{width:32px;height:32px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:16px;border:1px solid var(--b0);}
+.cc-sym{font-family:var(--mono);font-size:9px;color:var(--t2);letter-spacing:1px;}
+.cc-name{font-weight:700;font-size:13px;}
+.sig-badge{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 7px;border-radius:4px;text-transform:uppercase;}
+.sig-buy{background:var(--green2);color:var(--green);border:1px solid rgba(0,230,118,.25);}
+.sig-sell{background:var(--red2);color:var(--red);border:1px solid rgba(255,61,87,.25);}
+.sig-hold{background:var(--yellow2);color:var(--yellow);border:1px solid rgba(255,215,64,.25);}
+.cc-price{font-family:var(--mono);font-size:18px;font-weight:700;margin-bottom:2px;}
+.cc-chg{font-family:var(--mono);font-size:10px;font-weight:600;}
+.up{color:var(--green)}.dn{color:var(--red)}
+.mini-chart{height:44px;margin:8px 0 7px;}
+.cc-pills{display:flex;gap:4px;flex-wrap:wrap;}
+.pill{font-family:var(--mono);font-size:9px;padding:2px 5px;border-radius:3px;background:var(--bg4);border:1px solid var(--b0);color:var(--t1);}
+.pill span{color:var(--acc3);}
+
+/* STRATEGY CARDS */
+.strat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-bottom:18px;}
+.strat-card{background:var(--bg2);border:1px solid var(--b0);border-radius:12px;padding:14px;position:relative;}
+.strat-card.on-rsi{border-left:3px solid var(--green);}
+.strat-card.on-sma{border-left:3px solid var(--cyan);}
+.strat-card.on-mom{border-left:3px solid var(--orange);}
+.strat-card.off{border-left:3px solid var(--bg4);opacity:.5;}
+.strat-tog{position:absolute;top:12px;right:12px;width:32px;height:18px;border-radius:9px;background:var(--bg4);border:1px solid var(--b1);cursor:pointer;transition:all .2s;display:flex;align-items:center;padding:2px;}
+.strat-tog.on{background:var(--acc);}
+.strat-tog::after{content:'';width:12px;height:12px;border-radius:50%;background:white;transition:transform .2s;}
+.strat-tog.on::after{transform:translateX(14px);}
+.sn{font-weight:700;font-size:13px;margin-bottom:3px;padding-right:38px;}
+.stag{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;margin-bottom:8px;display:inline-block;}
+.sdesc{font-size:11px;color:var(--t1);line-height:1.6;margin-bottom:8px;}
+.ssig{font-family:var(--mono);font-size:9px;color:var(--t2);line-height:1.8;}
+.ssig strong{color:var(--t0);}
+
+/* DUAL SUGGESTION CARDS */
+.sug-card{background:var(--bg2);border:1px solid var(--b0);border-radius:10px;padding:12px;margin-bottom:8px;border-left:3px solid transparent;}
+.sug-card.buy-c{border-left-color:var(--green);}
+.sug-card.sell-c{border-left-color:var(--red);}
+.sug-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.sug-icon{font-size:20px;flex-shrink:0;margin-top:2px;}
+.sug-info{flex:1;}
+.sug-title{font-weight:700;font-size:13px;margin-bottom:2px;}
+.sug-detail{font-family:var(--mono);font-size:10px;color:var(--t1);line-height:1.5;}
+.sug-strat{font-family:var(--mono);font-size:9px;color:var(--t2);margin-top:2px;}
+/* dual comparison row inside suggestion */
+.dual-compare{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;margin-bottom:10px;}
+.dc-box{border-radius:7px;padding:9px 11px;}
+.dc-newton{background:var(--newtonDim);border:1px solid rgba(0,230,118,.2);}
+.dc-cdotcom{background:var(--cdotcomDim);border:1px solid rgba(77,124,255,.2);}
+.dc-name{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.5px;margin-bottom:5px;}
+.dc-newton .dc-name{color:var(--newton);}
+.dc-cdotcom .dc-name{color:var(--cdotcomBright);}
+.dc-row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--t2);margin-bottom:2px;}
+.dc-row span:last-child{color:var(--t1);}
+.dc-profit{font-family:var(--mono);font-size:13px;font-weight:700;margin-top:5px;}
+.dc-winner{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;background:rgba(255,215,64,.15);color:var(--yellow);border:1px solid rgba(255,215,64,.3);display:inline-block;margin-top:4px;}
+.sug-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;}
+.btn-confirm-n{background:linear-gradient(135deg,var(--green),#00a83a);border:none;color:#000;font-family:var(--sans);font-weight:700;font-size:10px;padding:6px 11px;border-radius:6px;cursor:pointer;white-space:nowrap;}
+.btn-confirm-c{background:linear-gradient(135deg,var(--cdotcomBright),#2255cc);border:none;color:white;font-family:var(--sans);font-weight:700;font-size:10px;padding:6px 11px;border-radius:6px;cursor:pointer;white-space:nowrap;}
+.btn-confirm-both{background:linear-gradient(135deg,var(--purple),var(--acc));border:none;color:white;font-family:var(--sans);font-weight:700;font-size:10px;padding:6px 11px;border-radius:6px;cursor:pointer;white-space:nowrap;}
+.btn-dismiss{background:var(--bg4);border:1px solid var(--b1);color:var(--t1);font-family:var(--sans);font-weight:600;font-size:10px;padding:6px 10px;border-radius:6px;cursor:pointer;white-space:nowrap;}
+.btn-dismiss:hover{border-color:var(--red);color:var(--red);}
+
+/* HOLDINGS */
+.alloc-row{background:var(--bg2);border:1px solid var(--b0);border-radius:9px;padding:10px 12px;display:flex;align-items:center;gap:8px;}
+.alloc-icon{font-size:17px;flex-shrink:0;}
+.alloc-info{flex:1;}
+.alloc-name{font-weight:600;font-size:12px;margin-bottom:1px;}
+.alloc-detail{font-family:var(--mono);font-size:9px;color:var(--t2);}
+.alloc-bar-wrap{flex:1;max-width:80px;}
+.alloc-bar{height:3px;background:var(--bg4);border-radius:2px;overflow:hidden;}
+.alloc-bar-fill{height:100%;border-radius:2px;transition:width .4s;}
+.alloc-value{font-family:var(--mono);font-size:11px;font-weight:700;min-width:58px;text-align:right;}
+.alloc-pnl{font-family:var(--mono);font-size:9px;min-width:50px;text-align:right;}
+
+/* FORMS */
+.form-box{background:var(--bg2);border:1px solid var(--b0);border-radius:12px;padding:13px;margin-bottom:13px;}
+.form-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;}
+.fg{flex:1;min-width:95px;}
+.fg label{font-family:var(--mono);font-size:9px;color:var(--t2);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:4px;}
+.fg select,.fg input{width:100%;background:var(--bg4);border:1px solid var(--b0);border-radius:6px;color:var(--t0);font-family:var(--mono);font-size:11px;padding:7px 8px;outline:none;transition:border-color .2s;}
+.fg select:focus,.fg input:focus{border-color:var(--acc2);}
+.btn{background:linear-gradient(135deg,var(--acc),#1558b0);border:none;color:white;font-family:var(--sans);font-weight:700;font-size:11px;padding:7px 13px;border-radius:7px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(29,111,216,.4);}
+.btn-sm{padding:4px 8px;font-size:10px;border-radius:5px;}
+.btn-red{background:linear-gradient(135deg,var(--red),#c0001a);}
+
+/* TRADE LOG */
+.trade-log{background:var(--bg2);border:1px solid var(--b0);border-radius:12px;overflow:hidden;margin-bottom:14px;overflow-x:auto;}
+.trade-log table{width:100%;border-collapse:collapse;min-width:620px;}
+.trade-log th{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--t2);padding:8px 11px;text-align:left;border-bottom:1px solid var(--b0);background:var(--bg3);}
+.trade-log td{padding:8px 11px;font-family:var(--mono);font-size:10px;border-bottom:1px solid rgba(30,100,200,.05);}
+.trade-log tr:last-child td{border-bottom:none;}
+.trade-log tr:hover td{background:rgba(29,111,216,.04);}
+
+/* PERF */
+.perf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:9px;margin-bottom:14px;}
+.perf-card{background:var(--bg2);border:1px solid var(--b0);border-radius:10px;padding:13px;text-align:center;}
+.perf-label{font-family:var(--mono);font-size:9px;color:var(--t2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;}
+.perf-value{font-family:var(--mono);font-size:19px;font-weight:700;}
+.perf-sub{font-family:var(--mono);font-size:9px;color:var(--t2);margin-top:3px;}
+
+/* COMP TABLE */
+.comp-table{background:var(--bg2);border:1px solid var(--b0);border-radius:12px;overflow:hidden;margin-bottom:14px;overflow-x:auto;}
+.comp-table table{width:100%;border-collapse:collapse;min-width:500px;}
+.comp-table th{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--t2);padding:8px 12px;text-align:left;border-bottom:1px solid var(--b0);background:var(--bg3);}
+.comp-table td{padding:10px 12px;font-family:var(--mono);font-size:11px;border-bottom:1px solid rgba(30,100,200,.05);}
+.comp-table tr:last-child td{border-bottom:none;}
+
+/* INFO BOXES */
+.info-box{background:rgba(255,215,64,.07);border:1px solid rgba(255,215,64,.2);border-radius:8px;padding:9px 12px;font-family:var(--mono);font-size:10px;color:var(--yellow);line-height:1.6;margin-bottom:12px;}
+.info-box.blue{background:rgba(29,111,216,.07);border-color:rgba(29,111,216,.25);color:var(--acc3);}
+.info-box.green{background:rgba(0,230,118,.07);border-color:rgba(0,230,118,.25);color:var(--green);}
+.info-box.purple{background:rgba(179,136,255,.07);border-color:rgba(179,136,255,.25);color:var(--purple);}
+
+/* AI */
+.ai-box{background:var(--bg2);border:1px solid var(--b0);border-radius:12px;padding:15px;margin-bottom:12px;}
+.ai-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.ai-orb{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#6d28d9,var(--acc));display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 14px rgba(109,40,217,.4);}
+.ai-resp{background:var(--bg4);border:1px solid var(--b0);border-radius:9px;padding:12px;font-size:12px;color:var(--t1);line-height:1.7;min-height:80px;white-space:pre-wrap;}
+.ai-dots{display:flex;align-items:center;gap:5px;}
+.ai-dot{width:5px;height:5px;border-radius:50%;background:var(--purple);animation:adot 1.4s ease-in-out infinite;}
+.ai-dot:nth-child(2){animation-delay:.2s}.ai-dot:nth-child(3){animation-delay:.4s}
+@keyframes adot{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+
+/* NOTIF */
+.notif{position:fixed;bottom:18px;right:18px;background:var(--bg3);border:1px solid var(--b1);border-radius:9px;padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--t0);z-index:500;animation:nin .3s ease;box-shadow:0 8px 28px rgba(0,0,0,.5);max-width:300px;}
+@keyframes nin{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* MOBILE NAV */
+.mnav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(7,18,32,.96);backdrop-filter:blur(20px);border-top:1px solid var(--b1);padding:4px 8px;gap:1px;z-index:100;}
+@media(max-width:700px){.mnav{display:flex;}.page{padding:11px 11px 70px;}}
+.mnb{flex:1;background:none;border:none;color:var(--t2);font-family:var(--sans);font-size:9px;font-weight:600;padding:4px 2px;border-radius:5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.mnb.active{color:var(--acc3);}
+.mnb span{font-size:14px;line-height:1;}
+
+/* MODALS */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);z-index:200;padding:16px;overflow-y:auto;}
+.overlay.open{display:flex;align-items:flex-start;justify-content:center;}
+.modal{background:var(--bg1);border:1px solid var(--b1);border-radius:16px;width:100%;max-width:660px;margin:auto;overflow:hidden;animation:mIn .25s ease;}
+@keyframes mIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.modal-hdr{padding:16px 20px;border-bottom:1px solid var(--b0);display:flex;align-items:center;justify-content:space-between;}
+.modal-body{padding:18px 20px;}
+.modal-close{background:var(--bg3);border:1px solid var(--b0);color:var(--t1);width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;}
+.modal-close:hover{border-color:var(--red);color:var(--red);}
+
+/* RVP */
+.rvp-row{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid rgba(30,100,200,.05);}
+.rvp-row:last-child{border-bottom:none;}
+.rvp-coin{font-weight:600;font-size:11px;display:flex;align-items:center;gap:6px;min-width:80px;}
+.rvp-bars{flex:1;display:flex;flex-direction:column;gap:3px;}
+.rvp-bar-row{display:flex;align-items:center;gap:6px;}
+.rvp-label{font-family:var(--mono);font-size:9px;color:var(--t2);min-width:56px;}
+.rvp-bar-bg{flex:1;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;}
+.rvp-bar-fg{height:100%;border-radius:3px;transition:width .5s;}
+.rvp-pct{font-family:var(--mono);font-size:10px;min-width:44px;text-align:right;}
+
+/* DETAIL CHART */
+#detail-chart{width:100%;height:230px;}
+.chart-tabs{display:flex;gap:4px;margin-bottom:8px;}
+.ct{background:none;border:1px solid var(--b0);color:var(--t2);font-family:var(--mono);font-size:9px;padding:3px 7px;border-radius:4px;cursor:pointer;}
+.ct.active{background:var(--acc);border-color:var(--acc);color:white;}
+.ind-row{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px;}
+.ind-card{background:var(--bg3);border:1px solid var(--b0);border-radius:7px;padding:10px;text-align:center;}
+.ind-lbl{font-family:var(--mono);font-size:9px;color:var(--t2);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;}
+.ind-val{font-family:var(--mono);font-size:14px;font-weight:700;}
+.rsi-l{color:var(--green)}.rsi-m{color:var(--yellow)}.rsi-h{color:var(--red)}
+
+/* SETUP */
+.setup-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);backdrop-filter:blur(10px);z-index:300;align-items:center;justify-content:center;}
+.setup-ov.open{display:flex;}
+.setup-box{background:var(--bg1);border:1px solid var(--b1);border-radius:18px;padding:28px;max-width:460px;width:100%;margin:16px;animation:mIn .3s ease;max-height:92vh;overflow-y:auto;}
+.setup-title{font-size:21px;font-weight:800;margin-bottom:4px;background:linear-gradient(90deg,var(--acc3),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.setup-sub{font-family:var(--mono);font-size:10px;color:var(--t2);margin-bottom:20px;}
+.setup-field{margin-bottom:14px;}
+.setup-field label{font-family:var(--mono);font-size:10px;color:var(--t1);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:4px;}
+.setup-field input{width:100%;background:var(--bg3);border:1px solid var(--b1);border-radius:8px;color:var(--t0);font-family:var(--mono);font-size:14px;padding:9px 12px;outline:none;}
+.presets{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;}
+.preset{background:var(--bg3);border:1px solid var(--b1);color:var(--t1);font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer;}
+.preset:hover{border-color:var(--acc2);color:var(--acc3);}
+.empty{text-align:center;color:var(--t2);padding:24px;font-family:var(--mono);font-size:11px;}
+
+/* EXCHANGE COMPARE TAB */
+.ex-compare-header{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.ex-summary-card{border-radius:14px;padding:16px;}
+.ex-summary-card.newton-card{background:var(--newtonDim);border:1px solid rgba(0,230,118,.25);}
+.ex-summary-card.cdotcom-card{background:var(--cdotcomDim);border:1px solid rgba(77,124,255,.25);}
+.ex-card-title{font-weight:800;font-size:15px;margin-bottom:2px;}
+.ex-card-title.n{color:var(--newton);}
+.ex-card-title.c{color:var(--cdotcomBright);}
+.ex-card-sub{font-family:var(--mono);font-size:9px;color:var(--t2);margin-bottom:10px;}
+.ex-stat-row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;margin-bottom:4px;}
+.ex-stat-row .lbl{color:var(--t2);}
+.ex-stat-row .val{font-weight:700;}
+.winner-banner{background:rgba(255,215,64,.1);border:1px solid rgba(255,215,64,.3);border-radius:10px;padding:12px 16px;text-align:center;margin-bottom:16px;font-family:var(--mono);font-size:12px;color:var(--yellow);}
+.winner-banner strong{font-size:16px;display:block;margin-top:4px;color:var(--t0);}
+</style>
+</head>
+<body>
+
+<!-- SETUP MODAL -->
+<div class="setup-ov" id="setup-ov">
+  <div class="setup-box">
+    <div class="setup-title">💎 CryptoLens v3.1</div>
+    <div class="setup-sub">Dual-exchange paper trading — Newton vs Crypto.com</div>
+
+    <div class="setup-field">
+      <label>Starting Paper Wallet (applied to BOTH exchanges)</label>
+      <input type="number" id="setup-bal" value="200" min="1" step="any">
+      <div class="presets">
+        <button class="preset" onclick="document.getElementById('setup-bal').value=50">$50</button>
+        <button class="preset" onclick="document.getElementById('setup-bal').value=100">$100</button>
+        <button class="preset" onclick="document.getElementById('setup-bal').value=200">$200</button>
+        <button class="preset" onclick="document.getElementById('setup-bal').value=500">$500</button>
+        <button class="preset" onclick="document.getElementById('setup-bal').value=1000">$1,000</button>
+        <button class="preset" onclick="document.getElementById('setup-bal').value=5000">$5,000</button>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+      <div style="background:var(--newtonDim);border:1px solid rgba(0,230,118,.3);border-radius:10px;padding:12px;">
+        <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--newton);margin-bottom:8px;">🇨🇦 NEWTON (Default)</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--t2);line-height:1.8;">
+          Fee: 0%<br>
+          BTC/ETH spread: ~1.0%<br>
+          SOL/CRO spread: ~1.35%<br>
+          Others spread: ~1.55%<br>
+          <span style="color:var(--yellow)">Round trip: 2.0–3.1%</span>
+        </div>
+      </div>
+      <div style="background:var(--cdotcomDim);border:1px solid rgba(77,124,255,.3);border-radius:10px;padding:12px;">
+        <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--cdotcomBright);margin-bottom:8px;">💙 CRYPTO.COM</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--t2);line-height:1.8;">
+          Fee: 0.4% per trade<br>
+          All coins spread: ~0.5%<br>
+          <br>
+          <span style="color:var(--yellow)">Round trip: ~1.3%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box" style="margin-bottom:16px;">
+      💡 Both wallets start with the same amount and run every trade simultaneously. This lets you see exactly which exchange would have made more money on each trade and over time.
+    </div>
+
+    <button class="btn" style="width:100%;padding:11px;font-size:14px;" onclick="startSession()">Start Dual Simulation →</button>
+    <div style="text-align:center;margin-top:10px;">
+      <button style="background:none;border:none;color:var(--t2);font-family:var(--mono);font-size:10px;cursor:pointer;" onclick="loadExisting()">← Load existing session</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="logo">💎 CryptoLens <span style="font-size:10px;opacity:.5;margin-left:2px">v3.1</span></div>
+  <nav>
+    <button class="nb active" onclick="showPage('market')">Market</button>
+    <button class="nb" onclick="showPage('strategies')">Strategies</button>
+    <button class="nb" onclick="showPage('trader')">Paper Trader</button>
+    <button class="nb" onclick="showPage('excompare')">Exchange Compare</button>
+    <button class="nb" onclick="showPage('performance')">Performance</button>
+    <button class="nb" onclick="showPage('realvspaper')">Real vs Paper</button>
+    <button class="nb" onclick="showPage('ai')">AI Advisor</button>
+  </nav>
+  <div class="header-r">
+    <div class="wpill"><div class="dot"></div><span id="hdr-bal">$—</span></div>
+    <button class="rbtn" onclick="refreshAll()" id="rbtn"><span class="si">⟳</span> Refresh</button>
+  </div>
+</header>
+
+<!-- MARKET -->
+<div class="page active" id="page-market">
+  <div class="stitle">Live Market</div>
+  <div style="display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none;" id="mkt-bar"></div>
+  <div class="coins-grid" id="coins-grid"></div>
+</div>
+
+<!-- STRATEGIES -->
+<div class="page" id="page-strategies">
+  <div class="stitle">Trading Strategies — Plain English</div>
+  <div class="info-box blue">📖 Three strategies power the signal scanner. When multiple agree on the same coin, confidence is higher. Newton's higher spread means the coin must move MORE to profit vs Crypto.com — this is factored into every suggestion.</div>
+  <div class="strat-grid">
+    <div class="strat-card on-rsi" id="card-rsi">
+      <div class="strat-tog on" id="tog-rsi" onclick="toggleStrat('rsi')"></div>
+      <div class="sn">📉 RSI Reversal</div>
+      <div class="stag" style="background:var(--green2);color:var(--green);border:1px solid rgba(0,230,118,.3)">Mean Reversion · Med Risk</div>
+      <div class="sdesc"><strong>RSI (Relative Strength Index)</strong> — a 0–100 gauge of whether a coin is being over-bought or over-sold. Markets overreact. RSI below 30 = oversold (likely to bounce). RSI above 70 = overbought (likely to drop). This bets on those reversals.</div>
+      <div class="ssig">🟢 <strong>BUY:</strong> RSI &lt; 30 (oversold)<br>🔴 <strong>SELL:</strong> RSI &gt; 70 (overbought)<br>⏱ Hours to 2 days · Best for: SHIB, SOL, WLD</div>
+    </div>
+    <div class="strat-card on-sma" id="card-sma">
+      <div class="strat-tog on" id="tog-sma" onclick="toggleStrat('sma')"></div>
+      <div class="sn">📈 SMA Crossover</div>
+      <div class="stag" style="background:rgba(0,212,255,.1);color:var(--cyan);border:1px solid rgba(0,212,255,.3)">Trend Following · Low Risk</div>
+      <div class="sdesc"><strong>SMA (Simple Moving Average)</strong> — 20-day vs 50-day average price. When the short-term average crosses above the long-term, it's a Golden Cross (buy). When it crosses below, it's a Death Cross (sell).</div>
+      <div class="ssig">🟢 <strong>BUY:</strong> SMA20 above SMA50 (Golden Cross)<br>🔴 <strong>SELL:</strong> SMA20 below SMA50 (Death Cross)<br>⏱ 3–14 days · Best for: BTC, ETH, CRO</div>
+    </div>
+    <div class="strat-card on-mom" id="card-mom">
+      <div class="strat-tog on" id="tog-mom" onclick="toggleStrat('mom')"></div>
+      <div class="sn">⚡ Momentum Scalping</div>
+      <div class="stag" style="background:rgba(255,145,0,.1);color:var(--orange);border:1px solid rgba(255,145,0,.3)">Trend Riding · High Risk</div>
+      <div class="sdesc"><strong>Momentum</strong> — things in motion stay in motion, briefly. If a coin is already surging upward (+4% in 5 periods), jump in to ride that wave before it reverses. Fastest, highest risk strategy.</div>
+      <div class="ssig">🟢 <strong>BUY:</strong> +4% momentum, RSI not overbought<br>🔴 <strong>SELL:</strong> -4% momentum, RSI not oversold<br>⏱ Minutes to hours · Best for: SOL, HNT, SONIC</div>
+    </div>
+  </div>
+
+  <div class="stitle">Newton vs Crypto.com — Fee Breakdown</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+    <div style="background:var(--newtonDim);border:1px solid rgba(0,230,118,.25);border-radius:12px;padding:14px;">
+      <div style="font-weight:700;font-size:14px;color:var(--newton);margin-bottom:10px;">🇨🇦 Newton</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--t2);line-height:2;">
+        <div style="display:flex;justify-content:space-between"><span>Trading fee:</span><span style="color:var(--green)">$0.00 (free)</span></div>
+        <div style="display:flex;justify-content:space-between"><span>BTC/ETH spread:</span><span style="color:var(--yellow)">~1.0% per side</span></div>
+        <div style="display:flex;justify-content:space-between"><span>SOL/CRO spread:</span><span style="color:var(--yellow)">~1.35% per side</span></div>
+        <div style="display:flex;justify-content:space-between"><span>HNT/S/WLD/SHIB:</span><span style="color:var(--yellow)">~1.55% per side</span></div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;padding-top:6px;border-top:1px solid rgba(0,230,118,.15)"><span>Round trip BTC:</span><span style="color:var(--red)">~2.0%</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Round trip others:</span><span style="color:var(--red)">~3.1%</span></div>
+      </div>
+    </div>
+    <div style="background:var(--cdotcomDim);border:1px solid rgba(77,124,255,.25);border-radius:12px;padding:14px;">
+      <div style="font-weight:700;font-size:14px;color:var(--cdotcomBright);margin-bottom:10px;">💙 Crypto.com</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--t2);line-height:2;">
+        <div style="display:flex;justify-content:space-between"><span>Trading fee:</span><span style="color:var(--yellow)">0.4% per trade</span></div>
+        <div style="display:flex;justify-content:space-between"><span>All coins spread:</span><span style="color:var(--yellow)">~0.5% per side</span></div>
+        <div style="display:flex;justify-content:space-between"><span>&nbsp;</span><span>&nbsp;</span></div>
+        <div style="display:flex;justify-content:space-between"><span>&nbsp;</span><span>&nbsp;</span></div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;padding-top:6px;border-top:1px solid rgba(77,124,255,.15)"><span>Round trip all coins:</span><span style="color:var(--green)">~1.3%</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Advantage over Newton:</span><span style="color:var(--green)">0.7–1.8%</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="info-box green">💡 Crypto.com's lower round-trip cost (~1.3%) vs Newton (~2–3.1%) means every trade starts closer to profit. On a $200 trade in SHIB: Newton costs ~$6.20 in spread. Crypto.com costs ~$2.60. That's $3.60 more profit per round trip on Crypto.com for the same trade — and that compounds over many trades.</div>
+</div>
+
+<!-- PAPER TRADER -->
+<div class="page" id="page-trader">
+  <div class="stitle">Paper Trader · Dual Simulation · Both exchanges run simultaneously</div>
+
+  <div class="dual-wallets">
+    <div class="wallet-panel newton-panel">
+      <div class="wp-name" style="color:var(--newton)">🇨🇦 Newton</div>
+      <div class="wp-row"><span class="wp-lbl">Cash</span><span class="wp-val" id="n-cash" style="color:var(--acc3)">—</span></div>
+      <div class="wp-row"><span class="wp-lbl">Holdings</span><span class="wp-val" id="n-holdings">—</span></div>
+      <div class="wp-row"><span class="wp-lbl">Total</span><span class="wp-val" id="n-total">—</span></div>
+      <div class="wp-row"><span class="wp-lbl">P&L</span><span class="wp-val" id="n-pnl">—</span></div>
+      <div class="wp-row"><span class="wp-lbl">Spread Paid</span><span class="wp-val" id="n-fees" style="color:var(--yellow)">—</span></div>
+    </div>
+    <div class="wallet-panel cdotcom-panel">
+      <div class="wp-name" style="color:var(--cdotcomBright)">💙 Crypto.com</div>
+      <div class="wp-row"><span class="wp-lbl">Cash</span><span class="wp-val" id="c-cash" style="color:var(--acc3)">—</span></div>
+      <div class="wp-row"><span class="wp-lbl">Holdings</span><span class="wp-val" id="c-holdings">—</span></div>
+      <div class="wp-row"><span class="wp-lbl">Total</span><span class="wp-val" id="c-total">—</span></div>
+      <div class="wp-row"><span class="wp-lbl">P&L</span><span class="wp-val" id="c-pnl">—</span></div>
+      <div class="wp-row"><span class="wp-lbl">Fees+Spread</span><span class="wp-val" id="c-fees" style="color:var(--yellow)">—</span></div>
+    </div>
+  </div>
+
+  <div class="info-box" id="leader-banner" style="text-align:center;"></div>
+
+  <div class="stitle">AI Trade Suggestions — Side-by-Side Exchange Comparison</div>
+  <div id="sug-wrap"><div class="empty">Click "Scan for Signals" — each suggestion shows projected profit on both exchanges.</div></div>
+  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+    <button class="btn" onclick="genSuggestions()">🔍 Scan for Signals</button>
+    <button class="btn" style="background:linear-gradient(135deg,#6d28d9,var(--acc))" onclick="aiCallPage('daytrading')">🤖 Ask AI Advisor</button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+    <div>
+      <div class="stitle">Newton Holdings</div>
+      <div id="n-holdings-wrap"><div class="empty" style="padding:14px;">No holdings.</div></div>
+    </div>
+    <div>
+      <div class="stitle">Crypto.com Holdings</div>
+      <div id="c-holdings-wrap"><div class="empty" style="padding:14px;">No holdings.</div></div>
+    </div>
+  </div>
+
+  <div class="stitle">Manual Trade (executes on both exchanges)</div>
+  <div class="form-box">
+    <div class="form-row">
+      <div class="fg"><label>Action</label><select id="t-act" onchange="feePreview()"><option value="buy">BUY</option><option value="sell">SELL</option></select></div>
+      <div class="fg"><label>Coin</label>
+        <select id="t-coin" onchange="feePreview()">
+          <option value="bitcoin">Bitcoin (BTC)</option><option value="ethereum">Ethereum (ETH)</option>
+          <option value="solana">Solana (SOL)</option><option value="helium">Helium (HNT)</option>
+          <option value="crypto-com-chain">Cronos (CRO)</option><option value="sonic-svm">Sonic (S)</option>
+          <option value="worldcoin-wld">Worldcoin (WLD)</option><option value="shiba-inu">Shiba Inu (SHIB)</option>
+        </select>
+      </div>
+      <div class="fg"><label>Amount ($)</label><input type="number" id="t-amt" placeholder="10.00" step="any" min="0" oninput="feePreview()"></div>
+      <button class="btn" onclick="manualTrade()">Execute Both</button>
+    </div>
+    <div id="fee-prev" style="display:none;margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;"></div>
+  </div>
+
+  <div class="stitle">Trade Log</div>
+  <div class="trade-log"><table>
+    <thead><tr><th>Time</th><th>Action</th><th>Coin</th><th>Gross</th><th>Newton Cost</th><th>Newton Net</th><th>CDC Cost</th><th>CDC Net</th><th>Strategy</th></tr></thead>
+    <tbody id="trade-tbody"><tr><td colspan="9" class="empty">No trades yet.</td></tr></tbody>
+  </table></div>
+</div>
+
+<!-- EXCHANGE COMPARE -->
+<div class="page" id="page-excompare">
+  <div class="stitle">Exchange Compare — Newton vs Crypto.com</div>
+
+  <div class="ex-compare-header">
+    <div class="ex-summary-card newton-card">
+      <div class="ex-card-title n">🇨🇦 Newton</div>
+      <div class="ex-card-sub">Spread-only · No trading fee</div>
+      <div class="ex-stat-row"><span class="lbl">Total Value</span><span class="val" id="ec-n-total" style="color:var(--newton)">—</span></div>
+      <div class="ex-stat-row"><span class="lbl">Net P&L</span><span class="val" id="ec-n-pnl">—</span></div>
+      <div class="ex-stat-row"><span class="lbl">Total Spread Paid</span><span class="val" id="ec-n-fees" style="color:var(--yellow)">—</span></div>
+      <div class="ex-stat-row"><span class="lbl">Trades Won</span><span class="val" id="ec-n-wins">—</span></div>
+      <div class="ex-stat-row"><span class="lbl">Win Rate</span><span class="val" id="ec-n-wr">—</span></div>
+      <div class="ex-stat-row"><span class="lbl">Avg Break-Even</span><span class="val" id="ec-n-be" style="color:var(--red)">—</span></div>
+    </div>
+    <div class="ex-summary-card cdotcom-card">
+      <div class="ex-card-title c">💙 Crypto.com</div>
+      <div class="ex-card-sub">0.4% fee + 0.5% spread</div>
+      <div class="ex-stat-row"><span class="lbl">Total Value</span><span class="val" id="ec-c-total" style="color:var(--cdotcomBright)">—</span></div>
+      <div class="ex-stat-row"><span class="lbl">Net P&L</span><span class="val" id="ec-c-pnl">—</span></div>
+      <div class="ex-stat-row"><span class="lbl">Total Fees+Spread</span><span class="val" id="ec-c-fees" style="color:var(--yellow)">—</span></div>
+      <div class="ex-stat-row"><span class="lbl">Trades Won</span><span class="val" id="ec-c-wins">—</span></div>
+      <div class="ex-stat-row"><span class="lbl">Win Rate</span><span class="val" id="ec-c-wr">—</span></div>
+      <div class="ex-stat-row"><span class="lbl">Avg Break-Even</span><span class="val" id="ec-c-be" style="color:var(--red)">—</span></div>
+    </div>
+  </div>
+
+  <div class="winner-banner" id="winner-banner">Run some trades to see which exchange wins overall.</div>
+
+  <div class="stitle">Per-Trade Comparison (closed trades)</div>
+  <div class="comp-table">
+    <table>
+      <thead><tr><th>Coin</th><th>Strategy</th><th>Trade $</th><th>Newton Net P&L</th><th>CDC Net P&L</th><th>Winner</th><th>Advantage</th></tr></thead>
+      <tbody id="compare-tbody"><tr><td colspan="7" class="empty">No closed trades yet.</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="stitle">Cumulative Advantage Over Time</div>
+  <div style="background:var(--bg2);border:1px solid var(--b0);border-radius:12px;padding:14px;margin-bottom:14px;">
+    <canvas id="cumul-chart" style="width:100%;height:200px;"></canvas>
+  </div>
+
+  <div class="stitle">Break-Even Analysis per Coin</div>
+  <div class="comp-table">
+    <table>
+      <thead><tr><th>Coin</th><th>Tier</th><th>Newton Round Trip</th><th>CDC Round Trip</th><th>CDC Advantage</th><th>Verdict</th></tr></thead>
+      <tbody id="be-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PERFORMANCE -->
+<div class="page" id="page-performance">
+  <div class="stitle">Strategy Performance</div>
+  <div class="perf-grid">
+    <div class="perf-card"><div class="perf-label">Total Trades</div><div class="perf-value" id="p-trades">0</div></div>
+    <div class="perf-card"><div class="perf-label">Newton Win Rate</div><div class="perf-value" id="p-n-wr" style="color:var(--newton)">—</div></div>
+    <div class="perf-card"><div class="perf-label">CDC Win Rate</div><div class="perf-value" id="p-c-wr" style="color:var(--cdotcomBright)">—</div></div>
+    <div class="perf-card"><div class="perf-label">Best Newton Trade</div><div class="perf-value" id="p-n-best" style="color:var(--green)">—</div></div>
+    <div class="perf-card"><div class="perf-label">Best CDC Trade</div><div class="perf-value" id="p-c-best" style="color:var(--green)">—</div></div>
+    <div class="perf-card"><div class="perf-label">Newton Fees Total</div><div class="perf-value" id="p-n-fees" style="color:var(--yellow)">$0</div></div>
+    <div class="perf-card"><div class="perf-label">CDC Fees Total</div><div class="perf-value" id="p-c-fees" style="color:var(--yellow)">$0</div></div>
+    <div class="perf-card"><div class="perf-label">Fee Difference</div><div class="perf-value" id="p-fee-diff" style="color:var(--purple)">—</div><div class="perf-sub">CDC saves vs Newton</div></div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+    <button class="btn btn-red btn-sm" onclick="if(confirm('Reset everything?')){resetAll();}">Reset Everything</button>
+    <button class="btn btn-sm" onclick="document.getElementById('setup-ov').classList.add('open')">Change Balance</button>
+  </div>
+</div>
+
+<!-- REAL VS PAPER -->
+<div class="page" id="page-realvspaper">
+  <div class="stitle">Real Market vs Paper Trades</div>
+  <div class="info-box blue">Shows how your paper trade entry prices compare to real market movement since you bought — on both exchanges. The fee gap between Newton and Crypto.com is visible here.</div>
+  <div id="rvp-wrap"><div class="empty">Make trades first.</div></div>
+  <div class="stitle" style="margin-top:14px;">If You Put All $<span id="opp-bal">200</span> Into One Coin (24h, raw no fees)</div>
+  <div id="opp-wrap"><div class="empty">Load prices first.</div></div>
+</div>
+
+<!-- AI -->
+<div class="page" id="page-ai">
+  <div class="stitle">AI Strategy Advisor</div>
+  <div class="ai-box">
+    <div class="ai-hdr">
+      <div class="ai-orb">🤖</div>
+      <div><div style="font-weight:700;font-size:14px;">Claude AI · Dual-Exchange Strategist</div><div style="font-family:var(--mono);font-size:10px;color:var(--t2);">Newton vs Crypto.com · RSI · SMA · Momentum</div></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <input type="password" id="api-key" placeholder="Anthropic API key (sk-ant-...)" style="flex:1;background:var(--bg4);border:1px solid var(--b0);border-radius:6px;color:var(--t0);font-family:var(--mono);font-size:11px;padding:7px 10px;outline:none;">
+      <button class="btn btn-sm" onclick="saveKey()">Save</button>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+      <button class="btn" onclick="aiCall('daytrading')" style="background:linear-gradient(135deg,#6d28d9,var(--acc))">📊 Day Trade Signals</button>
+      <button class="btn" onclick="aiCall('exchange')" style="background:linear-gradient(135deg,var(--newton),#00a83a);color:#000">⚖️ Which Exchange Wins?</button>
+      <button class="btn" onclick="aiCall('portfolio')" style="background:linear-gradient(135deg,var(--cdotcomBright),#2255cc)">💼 Portfolio Review</button>
+      <button class="btn" onclick="aiCall('rotation')" style="background:linear-gradient(135deg,var(--orange),#c45000)">🔄 Rotation Signals</button>
+    </div>
+    <div class="ai-resp" id="ai-resp">Enter your Anthropic API key and select an analysis type. The AI knows your Newton and Crypto.com fee structures and will factor both into its recommendations.</div>
+  </div>
+</div>
+
+<!-- COIN DETAIL MODAL -->
+<div class="overlay" id="modal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="cc-icon" id="m-icon" style="font-size:22px;width:42px;height:42px;"></div>
+        <div><div style="font-weight:800;font-size:16px;" id="m-name"></div><div style="font-family:var(--mono);font-size:9px;color:var(--t2);" id="m-sym"></div></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;">
+        <div style="font-family:var(--mono);font-size:24px;font-weight:700;" id="m-price"></div>
+        <div style="font-family:var(--mono);font-size:12px;font-weight:600;" id="m-chg"></div>
+        <div class="sig-badge" id="m-sig" style="margin-left:auto;"></div>
+      </div>
+      <div class="ind-row">
+        <div class="ind-card"><div class="ind-lbl">RSI (14)</div><div class="ind-val" id="m-rsi">—</div></div>
+        <div class="ind-card"><div class="ind-lbl">SMA 20</div><div class="ind-val" id="m-sma20" style="color:var(--cyan)">—</div></div>
+        <div class="ind-card"><div class="ind-lbl">SMA 50</div><div class="ind-val" id="m-sma50" style="color:var(--purple)">—</div></div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--b0);border-radius:9px;padding:12px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
+          <div class="chart-tabs"><button class="ct active" onclick="setRange(1,this)">1D</button><button class="ct" onclick="setRange(7,this)">7D</button><button class="ct" onclick="setRange(30,this)">30D</button></div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--t2);">Price · SMA20 · SMA50</div>
+        </div>
+        <canvas id="detail-chart"></canvas>
+      </div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--t2);">RSI &lt;30 oversold (bounce likely) · 30–70 neutral · &gt;70 overbought (drop likely)</div>
+    </div>
+  </div>
+</div>
+
+<div class="mnav">
+  <button class="mnb active" onclick="showPage('market',this)"><span>📈</span>Market</button>
+  <button class="mnb" onclick="showPage('strategies',this)"><span>📖</span>Learn</button>
+  <button class="mnb" onclick="showPage('trader',this)"><span>🎯</span>Trade</button>
+  <button class="mnb" onclick="showPage('excompare',this)"><span>⚖️</span>Compare</button>
+  <button class="mnb" onclick="showPage('performance',this)"><span>📊</span>Stats</button>
+  <button class="mnb" onclick="showPage('ai',this)"><span>🤖</span>AI</button>
+</div>
+
+<script>
+// ══ EXCHANGE CONFIGS ════════════════════════════════════
+// Newton: spread-only, varies by coin tier
+const NEWTON_TIERS = {
+  'bitcoin':          {spread:.010, tier:'Tier 1'},
+  'ethereum':         {spread:.010, tier:'Tier 1'},
+  'solana':           {spread:.0135,tier:'Tier 2'},
+  'crypto-com-chain': {spread:.0135,tier:'Tier 2'},
+  'helium':           {spread:.0155,tier:'Tier 3'},
+  'sonic-svm':        {spread:.0155,tier:'Tier 3'},
+  'worldcoin-wld':    {spread:.0155,tier:'Tier 3'},
+  'shiba-inu':        {spread:.0155,tier:'Tier 3'},
+};
+// Crypto.com: 0.4% fee + 0.5% spread all coins
+const CDC = {fee:.004, spread:.005};
+
+const COINS = [
+  {id:'bitcoin',         sym:'BTC', name:'Bitcoin',   icon:'₿'},
+  {id:'ethereum',        sym:'ETH', name:'Ethereum',  icon:'Ξ'},
+  {id:'solana',          sym:'SOL', name:'Solana',    icon:'◎'},
+  {id:'helium',          sym:'HNT', name:'Helium',    icon:'📡'},
+  {id:'crypto-com-chain',sym:'CRO', name:'Cronos',    icon:'🔷'},
+  {id:'sonic-svm',       sym:'S',   name:'Sonic',     icon:'⚡'},
+  {id:'worldcoin-wld',   sym:'WLD', name:'Worldcoin', icon:'🌍'},
+  {id:'shiba-inu',       sym:'SHIB',name:'Shiba Inu', icon:'🐕'},
+];
+
+// ══ STATE ════════════════════════════════════════════════
+let prices={}, histories={};
+// Two parallel wallets
+let nW = JSON.parse(localStorage.getItem('cl_nW')||'{"cash":200,"holdings":{},"trades":[],"totalFees":0}');
+let cW = JSON.parse(localStorage.getItem('cl_cW')||'{"cash":200,"holdings":{},"trades":[],"totalFees":0}');
+let STARTING = parseFloat(localStorage.getItem('cl_start')||'200');
+let apiKey = localStorage.getItem('cl_key')||'';
+let strats = {rsi:true, sma:true, mom:true};
+let detailChart=null, cumulChart=null, curCoin=null, pending=[];
+
+// ══ UTILS ════════════════════════════════════════════════
+const fmt = n => {
+  if(n===undefined||n===null||isNaN(n)) return '—';
+  if(Math.abs(n)<0.000001) return '$'+n.toExponential(2);
+  if(Math.abs(n)<0.01) return '$'+n.toFixed(8);
+  if(Math.abs(n)<1) return '$'+n.toFixed(4);
+  return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+};
+const fmtN = n => {
+  if(n===undefined||n===null||isNaN(n)) return '—';
+  if(Math.abs(n)<0.000001) return n.toExponential(2);
+  if(Math.abs(n)<0.01) return n.toFixed(8);
+  if(Math.abs(n)<1) return n.toFixed(4);
+  return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+};
+const pct = n => (n>=0?'+':'')+n.toFixed(2)+'%';
+const save = () => {
+  localStorage.setItem('cl_nW', JSON.stringify(nW));
+  localStorage.setItem('cl_cW', JSON.stringify(cW));
+  localStorage.setItem('cl_start', STARTING);
+};
+const notif = (msg,d=3500) => {
+  const el=document.createElement('div');el.className='notif';el.textContent=msg;
+  document.body.appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(()=>el.remove(),300);},d);
+};
+
+// Newton fee calculations (spread only, per coin)
+const nBuyP  = (coinId, p) => p * (1 + NEWTON_TIERS[coinId].spread/2);
+const nSellP = (coinId, p) => p * (1 - NEWTON_TIERS[coinId].spread/2);
+const nSpreadCost = (coinId, amt) => amt * NEWTON_TIERS[coinId].spread/2;
+const nRoundTrip  = coinId => (NEWTON_TIERS[coinId].spread * 100).toFixed(2);
+
+// Crypto.com fee calculations
+const cBuyP  = p => p * (1 + CDC.spread/2);
+const cSellP = p => p * (1 - CDC.spread/2);
+const cFee   = amt => amt * CDC.fee;
+const cSpreadCost = amt => amt * CDC.spread/2;
+const cRoundTrip  = () => ((CDC.fee*2 + CDC.spread)*100).toFixed(2);
+
+// ══ SETUP ════════════════════════════════════════════════
+function startSession(){
+  const bal = parseFloat(document.getElementById('setup-bal').value);
+  if(!bal||bal<1){notif('⚠ Enter valid amount');return;}
+  STARTING=bal;
+  nW={cash:bal,holdings:{},trades:[],totalFees:0};
+  cW={cash:bal,holdings:{},trades:[],totalFees:0};
+  save();
+  document.getElementById('setup-ov').classList.remove('open');
+  updateWallets();
+  notif(`✓ Dual simulation started: ${fmt(bal)} on Newton + ${fmt(bal)} on Crypto.com`);
+}
+function loadExisting(){
+  document.getElementById('setup-ov').classList.remove('open');
+  updateWallets();
+}
+
+// ══ INDICATORS ═══════════════════════════════════════════
+const rsi = (d,p=14) => {
+  if(d.length<p+1) return 50;
+  let g=0,l=0;
+  for(let i=d.length-p;i<d.length;i++){const x=d[i]-d[i-1];if(x>0)g+=x;else l-=x;}
+  if(l===0) return 100;
+  return 100-(100/(1+(g/p)/(l/p)));
+};
+const sma = (d,p) => {if(d.length<p)return null;return d.slice(-p).reduce((a,b)=>a+b,0)/p;};
+const mom = (d,p=5) => {if(d.length<p)return 0;return((d[d.length-1]-d[d.length-p])/d[d.length-p])*100;};
+const sig = (r,s20,s50,p) => {
+  let sc=0;
+  if(r<30)sc+=2;else if(r<40)sc+=1;else if(r>70)sc-=2;else if(r>60)sc-=1;
+  if(s20&&s50){if(s20>s50)sc+=1;else sc-=1;}
+  if(s20&&p>s20)sc+=1;else if(s20)sc-=1;
+  return sc>=2?'BUY':sc<=-2?'SELL':'HOLD';
+};
+
+// ══ STRATEGY TOGGLES ═════════════════════════════════════
+function toggleStrat(s){
+  strats[s]=!strats[s];
+  const t=document.getElementById('tog-'+s),c=document.getElementById('card-'+s);
+  t.className=strats[s]?'strat-tog on':'strat-tog';
+  c.className=strats[s]?`strat-card on-${s}`:'strat-card off';
+}
+
+// ══ TRADE EXECUTION ══════════════════════════════════════
+function execBoth(action, coinId, gross, strat='Manual'){
+  const mp = prices[coinId]?.price;
+  if(!mp){notif('⚠ No price data');return;}
+  const coin = COINS.find(c=>c.id===coinId);
+
+  // --- NEWTON ---
+  if(action==='buy'){
+    const effP = nBuyP(coinId, mp);
+    const spCost = nSpreadCost(coinId, gross);
+    const totalOut = gross; // Newton spread is in price, no extra deduction
+    if(totalOut > nW.cash){notif(`⚠ Newton: need ${fmt(totalOut)}, have ${fmt(nW.cash)}`);return;}
+    const units = gross / effP;
+    nW.cash -= gross;
+    if(!nW.holdings[coinId]) nW.holdings[coinId]={units:0,avgP:0,fees:0};
+    const h=nW.holdings[coinId];
+    h.avgP=(h.avgP*h.units+gross)/Math.max(h.units+units,0.0000001);
+    h.units+=units; h.fees=(h.fees||0)+spCost*2; // estimate round trip spread
+    nW.totalFees=(nW.totalFees||0)+spCost;
+    nW.trades.unshift({time:Date.now(),action:'BUY',coinId,coinSym:coin.sym,coinIcon:coin.icon,gross,cost:spCost,net:gross-spCost,price:effP,mp,units,strat,pnl:null,buyP:effP});
+  } else {
+    const h=nW.holdings[coinId];
+    if(!h||h.units<0.0000001){notif(`⚠ Newton: no ${coin.sym}`);return;}
+    const effP=nSellP(coinId,mp);
+    const unitsSold=Math.min(h.units, gross/effP);
+    const rec=unitsSold*effP;
+    const spCost=nSpreadCost(coinId,rec);
+    const costBasis=h.avgP*unitsSold;
+    const pnl=rec-costBasis;
+    nW.cash+=rec; h.units-=unitsSold;
+    nW.totalFees=(nW.totalFees||0)+spCost;
+    if(h.units<0.0000001) delete nW.holdings[coinId];
+    nW.trades.unshift({time:Date.now(),action:'SELL',coinId,coinSym:coin.sym,coinIcon:coin.icon,gross:rec,cost:spCost,net:rec-spCost,price:effP,mp,units:unitsSold,strat,pnl,buyP:h.avgP});
+  }
+
+  // --- CRYPTO.COM ---
+  if(action==='buy'){
+    const effP=cBuyP(mp);
+    const fee=cFee(gross);
+    const spCost=cSpreadCost(gross);
+    const totalOut=gross+fee;
+    if(totalOut > cW.cash){notif(`⚠ CDC: need ${fmt(totalOut)}, have ${fmt(cW.cash)}`);} 
+    else {
+      const units=gross/effP;
+      cW.cash-=totalOut;
+      if(!cW.holdings[coinId]) cW.holdings[coinId]={units:0,avgP:0,fees:0};
+      const h=cW.holdings[coinId];
+      h.avgP=(h.avgP*h.units+gross)/Math.max(h.units+units,0.0000001);
+      h.units+=units; h.fees=(h.fees||0)+fee+spCost;
+      cW.totalFees=(cW.totalFees||0)+fee+spCost;
+      cW.trades.unshift({time:Date.now(),action:'BUY',coinId,coinSym:coin.sym,coinIcon:coin.icon,gross,cost:fee+spCost,net:gross-fee-spCost,price:effP,mp,units,strat,pnl:null,buyP:effP});
+    }
+  } else {
+    const h=cW.holdings[coinId];
+    if(!h||h.units<0.0000001){notif(`⚠ CDC: no ${coin.sym}`);}
+    else {
+      const effP=cSellP(mp);
+      const unitsSold=Math.min(h.units,gross/effP);
+      const rec=unitsSold*effP;
+      const fee=cFee(rec);
+      const spCost=cSpreadCost(rec);
+      const costBasis=h.avgP*unitsSold;
+      const pnl=rec-fee-spCost-costBasis;
+      cW.cash+=rec-fee-spCost; h.units-=unitsSold;
+      cW.totalFees=(cW.totalFees||0)+fee+spCost;
+      if(h.units<0.0000001) delete cW.holdings[coinId];
+      cW.trades.unshift({time:Date.now(),action:'SELL',coinId,coinSym:coin.sym,coinIcon:coin.icon,gross:rec,cost:fee+spCost,net:rec-fee-spCost,price:effP,mp,units:unitsSold,strat,pnl,buyP:h.avgP});
+    }
+  }
+
+  save();
+  updateWallets();
+  renderHoldings();
+  renderLog();
+  notif(`✓ ${action.toUpperCase()} ${coin.sym} executed on both exchanges`);
+}
+
+function manualTrade(){
+  const action=document.getElementById('t-act').value;
+  const coinId=document.getElementById('t-coin').value;
+  const amt=parseFloat(document.getElementById('t-amt').value);
+  if(!amt||amt<=0){notif('⚠ Enter amount');return;}
+  execBoth(action,coinId,amt,'Manual');
+  document.getElementById('t-amt').value='';
+  document.getElementById('fee-prev').style.display='none';
+}
+
+function feePreview(){
+  const amt=parseFloat(document.getElementById('t-amt').value);
+  const coinId=document.getElementById('t-coin').value;
+  const action=document.getElementById('t-act').value;
+  const prev=document.getElementById('fee-prev');
+  if(!amt||amt<=0||!coinId){prev.style.display='none';return;}
+  const mp=prices[coinId]?.price||1;
+  const nSp=nSpreadCost(coinId,amt);
+  const cFeeAmt=cFee(amt);
+  const cSp=cSpreadCost(amt);
+  prev.style.display='grid';
+  prev.innerHTML=`
+    <div style="background:var(--newtonDim);border:1px solid rgba(0,230,118,.2);border-radius:7px;padding:9px;">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--newton);font-weight:700;margin-bottom:5px;">🇨🇦 Newton</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--t2);">Fee: $0.00<br>Spread cost: ~$${nSp.toFixed(4)}<br>Total cost: ~$${nSp.toFixed(4)}</div>
+    </div>
+    <div style="background:var(--cdotcomDim);border:1px solid rgba(77,124,255,.2);border-radius:7px;padding:9px;">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--cdotcomBright);font-weight:700;margin-bottom:5px;">💙 Crypto.com</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--t2);">Fee: $${cFeeAmt.toFixed(4)}<br>Spread cost: ~$${cSp.toFixed(4)}<br>Total cost: ~$${(cFeeAmt+cSp).toFixed(4)}</div>
+    </div>`;
+}
+
+// ══ SUGGESTIONS ══════════════════════════════════════════
+function genSuggestions(){
+  const wrap=document.getElementById('sug-wrap');
+  pending=[];const all=[];
+  COINS.forEach(coin=>{
+    const hist=histories[coin.id]||[];if(hist.length<5)return;
+    const p=prices[coin.id]?.price||0;
+    const r=rsi(hist),s20=sma(hist,Math.min(20,hist.length)),s50=sma(hist,Math.min(50,hist.length)),m=mom(hist);
+    const nRT=parseFloat(nRoundTrip(coin.id));
+    const cRT=parseFloat(cRoundTrip());
+    if(strats.rsi){
+      if(r<32) all.push({strat:'RSI Reversal',sc:'var(--green)',action:'BUY',coin,price:p,r,m,reason:`RSI oversold at ${r.toFixed(1)}`,conf:Math.round(((32-r)/32)*100),nRT,cRT});
+      if(r>68) all.push({strat:'RSI Reversal',sc:'var(--green)',action:'SELL',coin,price:p,r,m,reason:`RSI overbought at ${r.toFixed(1)}`,conf:Math.round(((r-68)/32)*100),nRT,cRT});
+    }
+    if(strats.sma&&s20&&s50){
+      const cross=((s20-s50)/s50)*100;
+      if(cross>0&&cross<3&&p>s20) all.push({strat:'SMA Crossover',sc:'var(--cyan)',action:'BUY',coin,price:p,r,m,reason:`Golden cross: SMA20 ${cross.toFixed(2)}% above SMA50`,conf:Math.min(90,Math.round(cross*15)),nRT,cRT});
+      if(cross<0&&cross>-3&&p<s20) all.push({strat:'SMA Crossover',sc:'var(--cyan)',action:'SELL',coin,price:p,r,m,reason:`Death cross: SMA20 ${Math.abs(cross).toFixed(2)}% below SMA50`,conf:Math.min(90,Math.round(Math.abs(cross)*15)),nRT,cRT});
+    }
+    if(strats.mom){
+      if(m>4&&r<65) all.push({strat:'Momentum',sc:'var(--orange)',action:'BUY',coin,price:p,r,m,reason:`Momentum +${m.toFixed(1)}%`,conf:Math.min(85,Math.round(m*8)),nRT,cRT});
+      if(m<-4&&r>35) all.push({strat:'Momentum',sc:'var(--orange)',action:'SELL',coin,price:p,r,m,reason:`Negative momentum ${m.toFixed(1)}%`,conf:Math.min(85,Math.round(Math.abs(m)*8)),nRT,cRT});
+    }
+  });
+  if(!all.length){wrap.innerHTML='<div class="empty">No strong signals right now. Try again after next refresh, or enable more strategies in the Strategies tab.</div>';return;}
+  pending=all;
+  wrap.innerHTML='<div id="sugs"></div>';
+  const sugsEl=document.getElementById('sugs');
+  all.forEach((s,i)=>{
+    const isBuy=s.action==='BUY';
+    const sugAmt=Math.max(5,Math.min(nW.cash*.25,50));
+    // Project profit if sold at current price (for illustration)
+    const moveNeeded=Math.max(s.nRT,s.cRT);
+    const projectedGain=sugAmt*(moveNeeded/100);
+    const nCost=nSpreadCost(s.coin.id,sugAmt);
+    const cCostAmt=cFee(sugAmt)+cSpreadCost(sugAmt);
+    const nNetProj=projectedGain-nCost;
+    const cNetProj=projectedGain-cCostAmt;
+    const nWinsThis=nCostAmt => false; // computed below
+    const cdcWins=cCostAmt<nCost;
+    sugsEl.innerHTML+=`
+      <div class="sug-card ${isBuy?'buy-c':'sell-c'}" id="sg-${i}">
+        <div class="sug-top">
+          <div class="sug-icon">${s.coin.icon}</div>
+          <div class="sug-info">
+            <div class="sug-title">${isBuy?'🟢':'🔴'} ${s.action} ${s.coin.name} (${s.coin.sym})</div>
+            <div class="sug-detail">${s.reason} · Price: ${fmt(s.price)} · Confidence: ${s.conf}%</div>
+            <div class="sug-detail">Suggested amount: <strong style="color:var(--acc3)">$${sugAmt.toFixed(2)}</strong></div>
+            <div class="sug-strat" style="color:${s.sc}">${s.strat}</div>
+          </div>
+        </div>
+        <div class="dual-compare">
+          <div class="dc-box dc-newton">
+            <div class="dc-name">🇨🇦 NEWTON</div>
+            <div class="dc-row"><span>Spread cost</span><span style="color:var(--yellow)">$${nCost.toFixed(4)}</span></div>
+            <div class="dc-row"><span>Break-even</span><span style="color:var(--red)">&gt;${s.nRT}% gain</span></div>
+            <div class="dc-row"><span>Conf clears BE?</span><span style="color:${s.conf>s.nRT?'var(--green)':'var(--red)'}">${s.conf>s.nRT?'✓ Yes':'✗ Risky'}</span></div>
+            ${!cdcWins?'<div class="dc-winner">💰 Lower cost this trade</div>':''}
+          </div>
+          <div class="dc-box dc-cdotcom">
+            <div class="dc-name">💙 CRYPTO.COM</div>
+            <div class="dc-row"><span>Fee+Spread</span><span style="color:var(--yellow)">$${cCostAmt.toFixed(4)}</span></div>
+            <div class="dc-row"><span>Break-even</span><span style="color:${cCostAmt<nCost?'var(--green)':'var(--red)'}">&gt;${s.cRT}% gain</span></div>
+            <div class="dc-row"><span>Conf clears BE?</span><span style="color:${s.conf>s.cRT?'var(--green)':'var(--red)'}">${s.conf>s.cRT?'✓ Yes':'✗ Risky'}</span></div>
+            ${cdcWins?'<div class="dc-winner">💰 Lower cost this trade</div>':''}
+          </div>
+        </div>
+        <div class="sug-actions">
+          <button class="btn-confirm-both" onclick="confirmBoth(${i},'${sugAmt.toFixed(2)}')">✓ Execute Both</button>
+          <button class="btn-confirm-n" onclick="confirmOne(${i},'${sugAmt.toFixed(2)}','newton')">Newton only</button>
+          <button class="btn-confirm-c" onclick="confirmOne(${i},'${sugAmt.toFixed(2)}','cdc')">CDC only</button>
+          <button class="btn-dismiss" onclick="dismissSug(${i})">✕ Skip</button>
+        </div>
+      </div>`;
+  });
+}
+
+function confirmBoth(i,amt){
+  const s=pending[i];if(!s){notif('⚠ Signal expired');return;}
+  execBoth(s.action.toLowerCase(),s.coin.id,parseFloat(amt),s.strat);
+  removeSug(i);
+}
+function confirmOne(i,amt,which){
+  const s=pending[i];if(!s){notif('⚠ Signal expired');return;}
+  const action=s.action.toLowerCase();
+  const coinId=s.coin.id;
+  const gross=parseFloat(amt);
+  const mp=prices[coinId]?.price;
+  if(!mp){notif('⚠ No price data');return;}
+  const coin=COINS.find(c=>c.id===coinId);
+  if(which==='newton'){
+    // execute only on Newton
+    if(action==='buy'){
+      const effP=nBuyP(coinId,mp),spCost=nSpreadCost(coinId,gross),units=gross/effP;
+      if(gross>nW.cash){notif('⚠ Newton: insufficient cash');return;}
+      nW.cash-=gross;
+      if(!nW.holdings[coinId])nW.holdings[coinId]={units:0,avgP:0,fees:0};
+      const h=nW.holdings[coinId];h.avgP=(h.avgP*h.units+gross)/(h.units+units);h.units+=units;h.fees=(h.fees||0)+spCost;
+      nW.totalFees=(nW.totalFees||0)+spCost;
+      nW.trades.unshift({time:Date.now(),action:'BUY',coinId,coinSym:coin.sym,coinIcon:coin.icon,gross,cost:spCost,net:gross-spCost,price:effP,mp,units,strat:s.strat,pnl:null,buyP:effP});
+    } else {
+      const h=nW.holdings[coinId];if(!h||h.units<0.0000001){notif('⚠ Newton: no holdings');return;}
+      const effP=nSellP(coinId,mp),unitsSold=Math.min(h.units,gross/effP),rec=unitsSold*effP,spCost=nSpreadCost(coinId,rec),pnl=rec-h.avgP*unitsSold;
+      nW.cash+=rec;h.units-=unitsSold;nW.totalFees=(nW.totalFees||0)+spCost;
+      if(h.units<0.0000001)delete nW.holdings[coinId];
+      nW.trades.unshift({time:Date.now(),action:'SELL',coinId,coinSym:coin.sym,coinIcon:coin.icon,gross:rec,cost:spCost,net:rec-spCost,price:effP,mp,units:unitsSold,strat:s.strat,pnl,buyP:h.avgP});
+    }
+    save();notif(`✓ Newton only: ${action.toUpperCase()} ${coin.sym}`);
+  } else {
+    // execute only on Crypto.com
+    if(action==='buy'){
+      const effP=cBuyP(mp),fee=cFee(gross),spCost=cSpreadCost(gross),units=gross/effP,totalOut=gross+fee;
+      if(totalOut>cW.cash){notif('⚠ CDC: insufficient cash');return;}
+      cW.cash-=totalOut;
+      if(!cW.holdings[coinId])cW.holdings[coinId]={units:0,avgP:0,fees:0};
+      const h=cW.holdings[coinId];h.avgP=(h.avgP*h.units+gross)/(h.units+units);h.units+=units;h.fees=(h.fees||0)+fee+spCost;
+      cW.totalFees=(cW.totalFees||0)+fee+spCost;
+      cW.trades.unshift({time:Date.now(),action:'BUY',coinId,coinSym:coin.sym,coinIcon:coin.icon,gross,cost:fee+spCost,net:gross-fee-spCost,price:effP,mp,units,strat:s.strat,pnl:null,buyP:effP});
+    } else {
+      const h=cW.holdings[coinId];if(!h||h.units<0.0000001){notif('⚠ CDC: no holdings');return;}
+      const effP=cSellP(mp),unitsSold=Math.min(h.units,gross/effP),rec=unitsSold*effP,fee=cFee(rec),spCost=cSpreadCost(rec),pnl=rec-fee-spCost-h.avgP*unitsSold;
+      cW.cash+=rec-fee-spCost;h.units-=unitsSold;cW.totalFees=(cW.totalFees||0)+fee+spCost;
+      if(h.units<0.0000001)delete cW.holdings[coinId];
+      cW.trades.unshift({time:Date.now(),action:'SELL',coinId,coinSym:coin.sym,coinIcon:coin.icon,gross:rec,cost:fee+spCost,net:rec-fee-spCost,price:effP,mp,units:unitsSold,strat:s.strat,pnl,buyP:h.avgP});
+    }
+    save();notif(`✓ Crypto.com only: ${action.toUpperCase()} ${coin.sym}`);
+  }
+  updateWallets();renderHoldings();renderLog();
+  removeSug(i);
+}
+function removeSug(i){
+  const el=document.getElementById('sg-'+i);
+  if(el){el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(()=>el.remove(),300);}
+  pending[i]=null;
+}
+function dismissSug(i){removeSug(i);}
+
+// ══ WALLET DISPLAY ════════════════════════════════════════
+function walletTotal(w){
+  let hv=0;
+  Object.entries(w.holdings).forEach(([id,h])=>hv+=h.units*(prices[id]?.price||h.avgP));
+  return w.cash+hv;
+}
+function walletHoldVal(w){
+  let hv=0;
+  Object.entries(w.holdings).forEach(([id,h])=>hv+=h.units*(prices[id]?.price||h.avgP));
+  return hv;
+}
+function updateWallets(){
+  const nTotal=walletTotal(nW),nPnl=nTotal-STARTING,nPp=(nPnl/STARTING)*100;
+  const cTotal=walletTotal(cW),cPnl=cTotal-STARTING,cPp=(cPnl/STARTING)*100;
+
+  // header shows combined or better performer
+  const best=Math.max(nTotal,cTotal);
+  document.getElementById('hdr-bal').textContent=`N:${fmt(nTotal)} C:${fmt(cTotal)}`;
+
+  // trader tab
+  document.getElementById('n-cash').textContent=fmt(nW.cash);
+  document.getElementById('n-holdings').textContent=fmt(walletHoldVal(nW));
+  document.getElementById('n-total').textContent=fmt(nTotal);
+  const npe=document.getElementById('n-pnl');npe.textContent=(nPnl>=0?'+':'')+fmt(nPnl)+' ('+pct(nPp)+')';npe.style.color=nPnl>=0?'var(--green)':'var(--red)';
+  document.getElementById('n-fees').textContent=fmt(nW.totalFees||0);
+
+  document.getElementById('c-cash').textContent=fmt(cW.cash);
+  document.getElementById('c-holdings').textContent=fmt(walletHoldVal(cW));
+  document.getElementById('c-total').textContent=fmt(cTotal);
+  const cpe=document.getElementById('c-pnl');cpe.textContent=(cPnl>=0?'+':'')+fmt(cPnl)+' ('+pct(cPp)+')';cpe.style.color=cPnl>=0?'var(--green)':'var(--red)';
+  document.getElementById('c-fees').textContent=fmt(cW.totalFees||0);
+
+  // leader banner
+  const diff=cTotal-nTotal;
+  const lb=document.getElementById('leader-banner');
+  if(Math.abs(diff)<0.01){lb.textContent='⚖️ Both exchanges exactly tied';}
+  else if(diff>0){lb.textContent=`💙 Crypto.com is ahead by ${fmt(Math.abs(diff))} · Saved ${fmt((nW.totalFees||0)-(cW.totalFees||0))} in fees vs Newton`;}
+  else{lb.textContent=`🇨🇦 Newton is ahead by ${fmt(Math.abs(diff))} · Despite higher spread — trade gains covering the cost`;}
+
+  // opp bal
+  const ob=document.getElementById('opp-bal');if(ob)ob.textContent=fmtN(STARTING);
+}
+
+// ══ HOLDINGS RENDER ═══════════════════════════════════════
+function renderHoldingPanel(w,elId,color){
+  const wrap=document.getElementById(elId);
+  const entries=Object.entries(w.holdings).filter(([,h])=>h.units>0.0000001);
+  if(!entries.length){wrap.innerHTML='<div class="empty" style="padding:12px;">No holdings.</div>';return;}
+  let tv=0;entries.forEach(([id,h])=>tv+=h.units*(prices[id]?.price||h.avgP));
+  wrap.innerHTML=entries.map(([id,h])=>{
+    const coin=COINS.find(c=>c.id===id)||{icon:'?',name:id,sym:'?'};
+    const cur=prices[id]?.price||h.avgP,val=h.units*cur,cost=h.avgP*h.units;
+    const pnl=val-cost,pp=cost>0?(pnl/cost)*100:0,pc=tv>0?(val/tv)*100:0;
+    return`<div class="alloc-row" style="margin-bottom:6px;">
+      <div class="alloc-icon">${coin.icon}</div>
+      <div class="alloc-info">
+        <div class="alloc-name">${coin.sym} <span style="font-size:9px;color:var(--t2)">${fmtN(h.units)}</span></div>
+        <div class="alloc-detail">Avg:${fmt(h.avgP)} Now:${fmt(cur)}</div>
+      </div>
+      <div class="alloc-bar-wrap"><div class="alloc-bar"><div class="alloc-bar-fill" style="width:${pc}%;background:${color}"></div></div></div>
+      <div class="alloc-value" style="color:${color}">${fmt(val)}</div>
+      <div class="alloc-pnl" style="color:${pnl>=0?'var(--green)':'var(--red)'}">${pnl>=0?'+':''}${fmt(pnl)}</div>
+    </div>`;
+  }).join('');
+}
+function renderHoldings(){
+  renderHoldingPanel(nW,'n-holdings-wrap','var(--newton)');
+  renderHoldingPanel(cW,'c-holdings-wrap','var(--cdotcomBright)');
+}
+
+// ══ TRADE LOG ═════════════════════════════════════════════
+function renderLog(){
+  const tb=document.getElementById('trade-tbody');
+  const combined=[];
+  // merge newton and cdc trades by time
+  const nt=nW.trades.map(t=>({...t,ex:'N'}));
+  const ct=cW.trades.map(t=>({...t,ex:'C'}));
+  // pair them: same coinId, same strat, similar timestamp
+  const nSells=nt.filter(t=>t.action==='SELL');
+  const cSells=ct.filter(t=>t.action==='SELL');
+  // just show newton trades with cdc equivalent alongside
+  const allTimes=[...new Set([...nt.map(t=>t.time),...ct.map(t=>t.time)])].sort((a,b)=>b-a).slice(0,40);
+  if(!nt.length&&!ct.length){tb.innerHTML='<tr><td colspan="9" class="empty">No trades yet.</td></tr>';return;}
+  // Show newton trades with matching cdc trade
+  const rows=nt.slice(0,30).map(t=>{
+    const match=ct.find(c=>c.coinId===t.coinId&&c.action===t.action&&Math.abs(c.time-t.time)<5000);
+    const time=new Date(t.time).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    const iB=t.action==='BUY';
+    const nPs=t.pnl!==null?`<span style="color:${t.pnl>=0?'var(--green)':'var(--red)'}">${t.pnl>=0?'+':''}${fmt(t.pnl)}</span>`:'<span style="color:var(--t2)">Open</span>';
+    const cPnl=match?.pnl;
+    const cPs=cPnl!==null&&cPnl!==undefined?`<span style="color:${cPnl>=0?'var(--green)':'var(--red)'}">${cPnl>=0?'+':''}${fmt(cPnl)}</span>`:'<span style="color:var(--t2)">Open</span>';
+    const winner=t.pnl!==null&&match?.pnl!==null?(t.pnl>=(match?.pnl||0)?'<span style="color:var(--newton)">N</span>':'<span style="color:var(--cdotcomBright)">C</span>'):'—';
+    return`<tr>
+      <td style="color:var(--t2)">${time}</td>
+      <td><span style="color:${iB?'var(--green)':'var(--red)'};font-weight:700">${t.action}</span></td>
+      <td>${t.coinIcon} ${t.coinSym}</td>
+      <td style="color:var(--acc3)">${fmt(t.gross)}</td>
+      <td style="color:var(--newton)">${fmt(t.cost)}</td>
+      <td>${nPs}</td>
+      <td style="color:var(--cdotcomBright)">${match?fmt(match.cost):'—'}</td>
+      <td>${cPs}</td>
+      <td style="font-size:9px;color:var(--t2)">${t.strat}</td>
+    </tr>`;
+  });
+  tb.innerHTML=rows.join('');
+}
+
+// ══ EXCHANGE COMPARE PAGE ═════════════════════════════════
+function renderExCompare(){
+  const nTotal=walletTotal(nW),nPnl=nTotal-STARTING;
+  const cTotal=walletTotal(cW),cPnl=cTotal-STARTING;
+  const nSells=nW.trades.filter(t=>t.action==='SELL'&&t.pnl!==null);
+  const cSells=cW.trades.filter(t=>t.action==='SELL'&&t.pnl!==null);
+  const nWins=nSells.filter(t=>t.pnl>0).length;
+  const cWins=cSells.filter(t=>t.pnl>0).length;
+  const nWR=nSells.length?((nWins/nSells.length)*100).toFixed(1)+'%':'—';
+  const cWR=cSells.length?((cWins/cSells.length)*100).toFixed(1)+'%':'—';
+
+  // Update summary cards
+  document.getElementById('ec-n-total').textContent=fmt(nTotal);
+  const enpEl=document.getElementById('ec-n-pnl');enpEl.textContent=(nPnl>=0?'+':'')+fmt(nPnl);enpEl.style.color=nPnl>=0?'var(--green)':'var(--red)';
+  document.getElementById('ec-n-fees').textContent=fmt(nW.totalFees||0);
+  document.getElementById('ec-n-wins').textContent=`${nWins}/${nSells.length}`;
+  document.getElementById('ec-n-wr').textContent=nWR;
+  document.getElementById('ec-n-be').textContent=nSells.length?'~'+((nW.totalFees||0)/Math.max(nSells.length,1)).toFixed(4)+'/trade':'—';
+
+  document.getElementById('ec-c-total').textContent=fmt(cTotal);
+  const ecpEl=document.getElementById('ec-c-pnl');ecpEl.textContent=(cPnl>=0?'+':'')+fmt(cPnl);ecpEl.style.color=cPnl>=0?'var(--green)':'var(--red)';
+  document.getElementById('ec-c-fees').textContent=fmt(cW.totalFees||0);
+  document.getElementById('ec-c-wins').textContent=`${cWins}/${cSells.length}`;
+  document.getElementById('ec-c-wr').textContent=cWR;
+  document.getElementById('ec-c-be').textContent=cSells.length?'~'+((cW.totalFees||0)/Math.max(cSells.length,1)).toFixed(4)+'/trade':'—';
+
+  // Winner banner
+  const wb=document.getElementById('winner-banner');
+  const diff=cTotal-nTotal;
+  const feeSave=(nW.totalFees||0)-(cW.totalFees||0);
+  if(!nSells.length&&!cSells.length){wb.innerHTML='Make some trades to see which exchange wins.';}
+  else if(Math.abs(diff)<0.001){wb.innerHTML='⚖️ Currently tied — keep trading to see a winner emerge.';}
+  else if(diff>0){wb.innerHTML=`💙 Crypto.com is winning<strong>by ${fmt(diff)} · Saved ${fmt(feeSave)} in fees vs Newton</strong>`;}
+  else{wb.innerHTML=`🇨🇦 Newton is winning<strong>by ${fmt(Math.abs(diff))} — trade gains outweigh higher spread</strong>`;}
+
+  // Per-trade comparison table
+  const tb=document.getElementById('compare-tbody');
+  const pairs=nSells.map(nt=>{
+    const ct=cSells.find(c=>c.coinId===nt.coinId&&c.action===nt.action&&Math.abs(c.time-nt.time)<5000);
+    return{nt,ct};
+  }).filter(p=>p.ct);
+  if(!pairs.length){tb.innerHTML='<tr><td colspan="7" class="empty">No matched closed trades yet.</td></tr>';}
+  else{
+    tb.innerHTML=pairs.map(({nt,ct})=>{
+      const coin=COINS.find(c=>c.id===nt.coinId);
+      const nWins=nt.pnl>=ct.pnl;
+      const adv=Math.abs(nt.pnl-ct.pnl);
+      return`<tr>
+        <td>${coin?.icon} ${coin?.sym}</td>
+        <td style="font-size:9px;color:var(--t2)">${nt.strat}</td>
+        <td style="color:var(--acc3)">${fmt(nt.gross)}</td>
+        <td style="color:${nt.pnl>=0?'var(--green)':'var(--red)'}">${nt.pnl>=0?'+':''}${fmt(nt.pnl)}</td>
+        <td style="color:${ct.pnl>=0?'var(--green)':'var(--red)'}">${ct.pnl>=0?'+':''}${fmt(ct.pnl)}</td>
+        <td>${nWins?'<span style="color:var(--newton)">🇨🇦 Newton</span>':'<span style="color:var(--cdotcomBright)">💙 CDC</span>'}</td>
+        <td style="color:var(--yellow)">+${fmt(adv)}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Break-even table
+  const beTb=document.getElementById('be-tbody');
+  beTb.innerHTML=COINS.map(coin=>{
+    const nRT=parseFloat(nRoundTrip(coin.id));
+    const cRT=parseFloat(cRoundTrip());
+    const adv=nRT-cRT;
+    const tier=NEWTON_TIERS[coin.id].tier;
+    return`<tr>
+      <td>${coin.icon} ${coin.name}</td>
+      <td style="font-size:9px;color:var(--t2)">${tier}</td>
+      <td style="color:var(--yellow)">${nRT}%</td>
+      <td style="color:var(--green)">${cRT}%</td>
+      <td style="color:var(--cdotcomBright)">CDC saves ${adv.toFixed(2)}%</td>
+      <td style="font-size:9px">${adv>1.5?'<span style="color:var(--cdotcomBright)">💙 CDC strongly favored</span>':adv>0.5?'<span style="color:var(--cdotcomBright)">💙 CDC slightly better</span>':'<span style="color:var(--t2)">Similar</span>'}</td>
+    </tr>`;
+  }).join('');
+
+  // Cumulative chart
+  renderCumulChart(nSells,cSells);
+}
+
+function renderCumulChart(nSells,cSells){
+  const canvas=document.getElementById('cumul-chart');if(!canvas||!window.Chart)return;
+  if(cumulChart){cumulChart.destroy();}
+  const maxTrades=Math.max(nSells.length,cSells.length,1);
+  const labels=Array.from({length:maxTrades+1},(_,i)=>i===0?'Start':`T${i}`);
+  let nCum=[STARTING],cCum=[STARTING];
+  for(let i=0;i<maxTrades;i++){
+    nCum.push(nCum[nCum.length-1]+(nSells[i]?.pnl||0));
+    cCum.push(cCum[cCum.length-1]+(cSells[i]?.pnl||0));
+  }
+  cumulChart=new Chart(canvas.getContext('2d'),{
+    type:'line',
+    data:{labels,datasets:[
+      {label:'Newton',data:nCum,borderColor:'#00e676',backgroundColor:'rgba(0,230,118,.08)',fill:true,borderWidth:2,pointRadius:3,tension:.3},
+      {label:'Crypto.com',data:cCum,borderColor:'#4d7cff',backgroundColor:'rgba(77,124,255,.08)',fill:true,borderWidth:2,pointRadius:3,tension:.3}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#7aacdc',font:{family:'JetBrains Mono',size:9},boxWidth:14}},
+        tooltip:{backgroundColor:'#0c1c30',borderColor:'rgba(30,100,200,.3)',borderWidth:1,titleColor:'#e8f4ff',bodyColor:'#7aacdc',titleFont:{family:'JetBrains Mono',size:9},bodyFont:{family:'JetBrains Mono',size:9},callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmt(ctx.raw)}`}}},
+      scales:{
+        x:{grid:{color:'rgba(30,100,200,.05)'},ticks:{color:'#3d6b99',font:{family:'JetBrains Mono',size:8}}},
+        y:{position:'right',grid:{color:'rgba(30,100,200,.05)'},ticks:{color:'#3d6b99',font:{family:'JetBrains Mono',size:8},callback:v=>fmt(v)}}
+      }
+    }
+  });
+}
+
+// ══ PERFORMANCE ═══════════════════════════════════════════
+function renderPerf(){
+  const nSells=nW.trades.filter(t=>t.action==='SELL'&&t.pnl!==null);
+  const cSells=cW.trades.filter(t=>t.action==='SELL'&&t.pnl!==null);
+  const nWins=nSells.filter(t=>t.pnl>0),cWins=cSells.filter(t=>t.pnl>0);
+  const nBest=nSells.length?Math.max(...nSells.map(t=>t.pnl)):null;
+  const cBest=cSells.length?Math.max(...cSells.map(t=>t.pnl)):null;
+  const totalTrades=Math.max(nW.trades.length,cW.trades.length);
+  document.getElementById('p-trades').textContent=totalTrades;
+  document.getElementById('p-n-wr').textContent=nSells.length?((nWins.length/nSells.length)*100).toFixed(1)+'%':'—';
+  document.getElementById('p-c-wr').textContent=cSells.length?((cWins.length/cSells.length)*100).toFixed(1)+'%':'—';
+  document.getElementById('p-n-best').textContent=nBest!==null?(nBest>=0?'+':'')+fmt(nBest):'—';
+  document.getElementById('p-c-best').textContent=cBest!==null?(cBest>=0?'+':'')+fmt(cBest):'—';
+  document.getElementById('p-n-fees').textContent=fmt(nW.totalFees||0);
+  document.getElementById('p-c-fees').textContent=fmt(cW.totalFees||0);
+  const diff=(nW.totalFees||0)-(cW.totalFees||0);
+  const fd=document.getElementById('p-fee-diff');fd.textContent=diff>=0?('+'+fmt(diff)):fmt(diff);fd.style.color=diff>=0?'var(--green)':'var(--red)';
+}
+
+// ══ REAL VS PAPER ══════════════════════════════════════════
+function renderRVP(){
+  const nBuys=nW.trades.filter(t=>t.action==='BUY');
+  const wrap=document.getElementById('rvp-wrap');
+  if(!nBuys.length){wrap.innerHTML='<div class="empty">Make trades first.</div>';renderOpp();return;}
+  const ent={};
+  nBuys.forEach(t=>{if(!ent[t.coinId])ent[t.coinId]={coin:COINS.find(c=>c.id===t.coinId),nBuyP:t.price,spent:t.gross};});
+  const cBuys=cW.trades.filter(t=>t.action==='BUY');
+  cBuys.forEach(t=>{if(ent[t.coinId])ent[t.coinId].cBuyP=t.price;});
+  const rows=Object.entries(ent).map(([id,e])=>{
+    const cur=prices[id]?.price||e.nBuyP;
+    const nSell=nSellP(id,cur),cSell=cSellP(cur);
+    const nPnl=((nSell-e.nBuyP)/e.nBuyP)*100;
+    const cPnl=((cSell-(e.cBuyP||e.nBuyP))/(e.cBuyP||e.nBuyP))*100;
+    const realChg=prices[id]?.change24h||0;
+    return`<div class="rvp-row"><div class="rvp-coin">${e.coin?.icon||'?'} ${e.coin?.sym||id}</div>
+      <div class="rvp-bars">
+        <div class="rvp-bar-row"><div class="rvp-label" style="color:var(--newton)">Newton</div><div class="rvp-bar-bg"><div class="rvp-bar-fg" style="width:${Math.min(100,Math.max(0,50+nPnl*5))}%;background:${nPnl>=0?'var(--newton)':'var(--red)'}"></div></div><div class="rvp-pct" style="color:${nPnl>=0?'var(--newton)':'var(--red)'}">${pct(nPnl)}</div></div>
+        <div class="rvp-bar-row"><div class="rvp-label" style="color:var(--cdotcomBright)">CDC</div><div class="rvp-bar-bg"><div class="rvp-bar-fg" style="width:${Math.min(100,Math.max(0,50+cPnl*5))}%;background:${cPnl>=0?'var(--cdotcomBright)':'var(--red)'}"></div></div><div class="rvp-pct" style="color:${cPnl>=0?'var(--cdotcomBright)':'var(--red)'}">${pct(cPnl)}</div></div>
+        <div class="rvp-bar-row"><div class="rvp-label" style="color:var(--yellow)">Real 24h</div><div class="rvp-bar-bg"><div class="rvp-bar-fg" style="width:${Math.min(100,Math.max(0,50+realChg*5))}%;background:${realChg>=0?'var(--cyan)':'var(--yellow)'}"></div></div><div class="rvp-pct" style="color:${realChg>=0?'var(--cyan)':'var(--yellow)'}">${pct(realChg)}</div></div>
+      </div>
+    </div>`;
+  });
+  wrap.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--b0);border-radius:12px;overflow:hidden">${rows.join('')}</div>`;
+  renderOpp();
+}
+function renderOpp(){
+  const wrap=document.getElementById('opp-wrap');
+  const rows=COINS.map(c=>({coin:c,chg:prices[c.id]?.change24h||0})).sort((a,b)=>b.chg-a.chg);
+  wrap.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--b0);border-radius:12px;overflow:hidden">
+    ${rows.map(r=>{const gain=STARTING*(1+r.chg/100)-STARTING;return`<div class="rvp-row">
+      <div class="rvp-coin">${r.coin.icon} ${r.coin.sym}</div>
+      <div class="rvp-bars"><div class="rvp-bar-row"><div class="rvp-label">24h</div><div class="rvp-bar-bg"><div class="rvp-bar-fg" style="width:${Math.min(100,Math.max(0,50+r.chg*3))}%;background:${r.chg>=0?'var(--green)':'var(--red)'}"></div></div><div class="rvp-pct" style="color:${r.chg>=0?'var(--green)':'var(--red)'}">${pct(r.chg)}</div></div></div>
+      <div style="font-family:var(--mono);font-size:10px;color:${gain>=0?'var(--green)':'var(--red)'};min-width:58px;text-align:right">${gain>=0?'+':''}${fmt(gain)}<br><span style="font-size:8px;color:var(--t2)">on ${fmt(STARTING)}</span></div>
+    </div>`}).join('')}
+  </div>`;
+}
+function resetAll(){
+  nW={cash:STARTING,holdings:{},trades:[],totalFees:0};
+  cW={cash:STARTING,holdings:{},trades:[],totalFees:0};
+  save();updateWallets();renderHoldings();renderLog();renderPerf();
+  notif('✓ Both wallets reset');
+}
+
+// ══ PAGES ════════════════════════════════════════════════
+function showPage(name,mb){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.mnb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const nbs=document.querySelectorAll('.nb');
+  const idx=['market','strategies','trader','excompare','performance','realvspaper','ai'].indexOf(name);
+  if(idx>=0&&nbs[idx])nbs[idx].classList.add('active');
+  if(mb)mb.classList.add('active');
+  if(name==='trader'){renderHoldings();renderLog();updateWallets();}
+  if(name==='excompare')renderExCompare();
+  if(name==='performance')renderPerf();
+  if(name==='realvspaper')renderRVP();
+  if(name==='ai'&&apiKey)document.getElementById('api-key').value=apiKey;
+}
+
+// ══ MARKET DATA ═══════════════════════════════════════════
+async function refreshAll(){
+  const btn=document.getElementById('rbtn');btn.classList.add('spin');
+  try{
+    const res=await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${COINS.map(c=>c.id).join(',')}&vs_currencies=usd&include_24hr_change=true&include_market_cap=true`);
+    const data=await res.json();
+    COINS.forEach(c=>{if(data[c.id])prices[c.id]={price:data[c.id].usd,change24h:data[c.id].usd_24h_change,mcap:data[c.id].usd_market_cap};});
+  }catch(e){mockPrices();}
+  renderMktBar();renderCoins();updateWallets();renderHoldings();
+  btn.classList.remove('spin');
+}
+function mockPrices(){
+  Object.assign(prices,{'bitcoin':{price:87432,change24h:2.34,mcap:1710e9},'ethereum':{price:3218,change24h:-1.12,mcap:386e9},'solana':{price:142.87,change24h:5.67,mcap:65e9},'helium':{price:4.23,change24h:-3.21,mcap:621e6},'crypto-com-chain':{price:.1042,change24h:1.05,mcap:2.74e9},'sonic-svm':{price:.4872,change24h:8.34,mcap:487e6},'worldcoin-wld':{price:1.87,change24h:-2.45,mcap:934e6},'shiba-inu':{price:.00001342,change24h:4.12,mcap:7.9e9}});
+  notif('⚠ Demo data — CoinGecko rate limited');
+}
+async function fetchHist(id,days=30){
+  try{const res=await fetch(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=${days}&interval=${days<=1?'hourly':'daily'}`);const d=await res.json();if(d.prices)return d.prices.map(p=>p[1]);}catch(e){}
+  return mockHist(prices[id]?.price||100,days<=1?24:days);
+}
+function mockHist(cur,pts){const a=[];let p=cur*(.85+Math.random()*.3);for(let i=0;i<pts;i++){p*=1+(Math.random()-.48)*.05;a.push(p);}a[a.length-1]=cur;return a;}
+
+function renderMktBar(){
+  const g=COINS.filter(c=>prices[c.id]?.change24h>0).length;
+  const mc=COINS.reduce((s,c)=>s+(prices[c.id]?.mcap||0),0);
+  document.getElementById('mkt-bar').innerHTML=`
+    <div style="background:var(--bg2);border:1px solid var(--b0);border-radius:7px;padding:6px 10px;white-space:nowrap;font-family:var(--mono);font-size:10px;color:var(--t1);flex-shrink:0">🟢 ${g}/${COINS.length} gaining</div>
+    <div style="background:var(--bg2);border:1px solid var(--b0);border-radius:7px;padding:6px 10px;white-space:nowrap;font-family:var(--mono);font-size:10px;color:var(--t1);flex-shrink:0">MCap: $${(mc/1e9).toFixed(0)}B</div>
+    <div style="background:var(--newtonDim);border:1px solid rgba(0,230,118,.2);border-radius:7px;padding:6px 10px;white-space:nowrap;font-family:var(--mono);font-size:10px;color:var(--newton);flex-shrink:0">🇨🇦 Newton: ${fmt(walletTotal(nW))}</div>
+    <div style="background:var(--cdotcomDim);border:1px solid rgba(77,124,255,.2);border-radius:7px;padding:6px 10px;white-space:nowrap;font-family:var(--mono);font-size:10px;color:var(--cdotcomBright);flex-shrink:0">💙 Crypto.com: ${fmt(walletTotal(cW))}</div>`;
+}
+
+function renderCoins(){
+  const grid=document.getElementById('coins-grid');grid.innerHTML='';
+  COINS.forEach(coin=>{
+    const d=prices[coin.id];const hist=histories[coin.id]||mockHist(d?.price||100,20);
+    const r=rsi(hist),s20=sma(hist,Math.min(20,hist.length)),s50=sma(hist,Math.min(50,hist.length)),m=mom(hist);
+    const sg=sig(r,s20,s50,d?.price||0);const up=(d?.change24h||0)>=0;
+    const nRT=nRoundTrip(coin.id),cRT=cRoundTrip();
+    const card=document.createElement('div');card.className='coin-card';card.onclick=()=>openModal(coin);
+    card.innerHTML=`<div class="cc-top"><div class="cc-id"><div class="cc-icon">${coin.icon}</div><div><div class="cc-name">${coin.name}</div><div class="cc-sym">${coin.sym}</div></div></div><div class="sig-badge sig-${sg.toLowerCase()}">${sg}</div></div>
+      <div class="cc-price">${fmt(d?.price)}</div>
+      <div class="cc-chg ${up?'up':'dn'}">${up?'▲':'▼'} ${Math.abs(d?.change24h||0).toFixed(2)}% 24h</div>
+      <div class="mini-chart"><canvas id="mn-${coin.id}" height="44"></canvas></div>
+      <div class="cc-pills">
+        <div class="pill">RSI <span>${r.toFixed(0)}</span></div>
+        ${s20?`<div class="pill">SMA20 <span>${fmtN(s20)}</span></div>`:''}
+        <div class="pill" style="color:var(--newton)">N: ${nRT}%</div>
+        <div class="pill" style="color:var(--cdotcomBright)">C: ${cRT}%</div>
+      </div>`;
+    grid.appendChild(card);setTimeout(()=>drawMini(coin.id,hist,up),10);
+  });
+}
+function drawMini(id,data,up){
+  const c=document.getElementById('mn-'+id);if(!c)return;
+  const ctx=c.getContext('2d');const W=c.offsetWidth||260,H=44;c.width=W;c.height=H;
+  const sl=data.slice(-20);const mn=Math.min(...sl),mx=Math.max(...sl),rng=mx-mn||1;
+  const pts=sl.map((v,i)=>({x:(i/(sl.length-1))*W,y:H-((v-mn)/rng)*(H-8)-4}));
+  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,up?'rgba(0,230,118,.2)':'rgba(255,61,87,.2)');g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.beginPath();ctx.moveTo(pts[0].x,H);pts.forEach(p=>ctx.lineTo(p.x,p.y));ctx.lineTo(pts[pts.length-1].x,H);ctx.fillStyle=g;ctx.fill();
+  ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));ctx.strokeStyle=up?'#00e676':'#ff3d57';ctx.lineWidth=1.5;ctx.stroke();
+}
+
+// ══ DETAIL MODAL ══════════════════════════════════════════
+async function openModal(coin){
+  curCoin=coin;document.getElementById('modal').classList.add('open');
+  document.getElementById('m-icon').textContent=coin.icon;document.getElementById('m-name').textContent=coin.name;document.getElementById('m-sym').textContent=coin.sym;
+  const d=prices[coin.id]||{};document.getElementById('m-price').textContent=fmt(d.price);
+  const ce=document.getElementById('m-chg');const chg=d.change24h||0;ce.textContent=`${chg>=0?'▲':'▼'} ${Math.abs(chg).toFixed(2)}%`;ce.className=chg>=0?'up':'dn';
+  const hist=await fetchHist(coin.id,30);histories[coin.id]=hist;
+  const r=rsi(hist),s20=sma(hist,Math.min(20,hist.length)),s50=sma(hist,Math.min(50,hist.length));
+  const sg=sig(r,s20,s50,d.price||0);
+  const re=document.getElementById('m-rsi');re.textContent=r.toFixed(1);re.className='ind-val '+(r<30?'rsi-l':r>70?'rsi-h':'rsi-m');
+  document.getElementById('m-sma20').textContent=s20?fmtN(s20):'—';document.getElementById('m-sma50').textContent=s50?fmtN(s50):'—';
+  const se=document.getElementById('m-sig');se.textContent=sg;se.className='sig-badge sig-'+sg.toLowerCase();
+  drawDetail(hist);
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');if(detailChart){detailChart.destroy();detailChart=null;}}
+function setRange(d,btn){document.querySelectorAll('.ct').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(curCoin)fetchHist(curCoin.id,d).then(h=>{histories[curCoin.id]=h;drawDetail(h);});}
+function drawDetail(hist){
+  const canvas=document.getElementById('detail-chart');if(!canvas)return;if(detailChart){detailChart.destroy();}
+  const labels=hist.map((_,i)=>hist.length<=24?`${i}h`:`D${i+1}`);
+  const s20a=hist.map((_,i)=>{const sl=hist.slice(Math.max(0,i-19),i+1);return sl.reduce((a,b)=>a+b,0)/sl.length;});
+  const s50a=hist.map((_,i)=>{if(i<49)return null;const sl=hist.slice(i-49,i+1);return sl.reduce((a,b)=>a+b,0)/sl.length;});
+  const up=hist[hist.length-1]>=hist[0];
+  detailChart=new Chart(canvas.getContext('2d'),{type:'line',data:{labels,datasets:[
+    {label:'Price',data:hist,borderColor:up?'#00e676':'#ff3d57',backgroundColor:up?'rgba(0,230,118,.08)':'rgba(255,61,87,.08)',fill:true,borderWidth:2,pointRadius:0,tension:.3},
+    {label:'SMA20',data:s20a,borderColor:'#00d4ff',borderWidth:1.5,borderDash:[4,4],pointRadius:0,fill:false,tension:.3},
+    {label:'SMA50',data:s50a,borderColor:'#b388ff',borderWidth:1.5,borderDash:[6,3],pointRadius:0,fill:false,tension:.3}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{labels:{color:'#7aacdc',font:{family:'JetBrains Mono',size:9},boxWidth:14}},tooltip:{backgroundColor:'#0c1c30',borderColor:'rgba(30,100,200,.3)',borderWidth:1,titleColor:'#e8f4ff',bodyColor:'#7aacdc',titleFont:{family:'JetBrains Mono',size:9},bodyFont:{family:'JetBrains Mono',size:9},callbacks:{label:ctx=>` ${ctx.dataset.label}: $${fmtN(ctx.raw)}`}}},
+    scales:{x:{grid:{color:'rgba(30,100,200,.05)'},ticks:{color:'#3d6b99',font:{family:'JetBrains Mono',size:8},maxTicksLimit:8}},y:{position:'right',grid:{color:'rgba(30,100,200,.05)'},ticks:{color:'#3d6b99',font:{family:'JetBrains Mono',size:8},callback:v=>'$'+fmtN(v)}}}}});
+}
+
+// ══ AI ════════════════════════════════════════════════════
+function saveKey(){const k=document.getElementById('api-key').value.trim();if(!k)return;apiKey=k;localStorage.setItem('cl_key',k);notif('✓ Key saved');}
+function aiCallPage(type){showPage('ai');setTimeout(()=>aiCall(type),100);}
+async function aiCall(type){
+  if(!apiKey){notif('⚠ Enter API key in AI Advisor tab');showPage('ai');return;}
+  const el=document.getElementById('ai-resp');
+  el.innerHTML=`<div class="ai-dots"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div><span style="font-family:var(--mono);font-size:11px;color:var(--purple);margin-left:6px">Analyzing Newton vs Crypto.com...</span></div>`;
+  const mkt=COINS.map(coin=>{
+    const d=prices[coin.id]||{};const hist=histories[coin.id]||[];
+    const r=hist.length>14?rsi(hist):null,s20=hist.length>=20?sma(hist,20):null,s50=hist.length>=50?sma(hist,50):null,m=hist.length>=5?mom(hist):null;
+    return`${coin.name}(${coin.sym}): $${fmtN(d.price)} | 24h:${(d.change24h||0).toFixed(2)}% | RSI:${r?.toFixed(1)||'N/A'} | Mom:${m?.toFixed(1)||'N/A'}% | Signal:${sig(r||50,s20,s50,d.price||0)} | Newton RT:${nRoundTrip(coin.id)}% | CDC RT:${cRoundTrip()}%`;
+  }).join('\n');
+  const nHold=Object.entries(nW.holdings).map(([id,h])=>{const coin=COINS.find(c=>c.id===id);const cur=prices[id]?.price||h.avgP;return`${coin?.sym}: ${fmtN(h.units)} @ avg $${fmtN(h.avgP)}, now $${fmtN(cur)} (${((cur-h.avgP)/h.avgP*100).toFixed(1)}% P&L)`;}).join('\n')||'None';
+  const nTotal=walletTotal(nW),cTotal=walletTotal(cW);
+  const feeCtxN=`Newton: 0% fee, spread varies 1.0–1.55% per side by coin tier. Round trips: BTC/ETH ~2%, SOL/CRO ~2.7%, others ~3.1%.`;
+  const feeCtxC=`Crypto.com: 0.4% fee + 0.5% spread all coins. Round trip ~1.3% all coins.`;
+  const walCtx=`Starting: $${STARTING} each. Newton: ${fmt(nTotal)} (${pct((nTotal-STARTING)/STARTING*100)}). CDC: ${fmt(cTotal)} (${pct((cTotal-STARTING)/STARTING*100)}). Fee drag Newton: ${fmt(nW.totalFees||0)}, CDC: ${fmt(cW.totalFees||0)}.`;
+  const prompts={
+    daytrading:`You are a crypto day trader with two parallel paper wallets on Newton (Canada) and Crypto.com.\n\nFEE CONTEXT:\n${feeCtxN}\n${feeCtxC}\n\nMarket data (includes break-even % for each exchange per coin):\n${mkt}\n\n${walCtx}\n\nFor each trade suggestion, specify: which exchange to use and why, the expected gain needed to profit on each, and if the trade only makes sense on one exchange due to fees. Be specific.`,
+    exchange:`Compare Newton vs Crypto.com for these specific coins right now:\n${mkt}\n\nFee context: ${feeCtxN} ${feeCtxC}\n${walCtx}\n\nWhich exchange is better for day trading each coin? Factor in coin-specific Newton tiers. Are there coins where Newton's zero-fee model beats CDC's flat spread despite higher spread? Give a clear recommendation for each coin.`,
+    portfolio:`Portfolio (Newton):\n${nHold}\n${walCtx}\n\nMarket:\n${mkt}\n\nFee context: ${feeCtxN} ${feeCtxC}\n\nReview current holdings. Should anything be moved between exchanges conceptually? Is the fee drag from Newton's spread affecting this portfolio? What's the optimal strategy given both fee structures?`,
+    rotation:`Rotation signals considering dual exchange costs:\n${walCtx}\nMarket:\n${mkt}\nFee context: ${feeCtxN} ${feeCtxC}\n\nIdentify rotation plays. Account for exit costs on Newton (spread) AND entry costs on destination exchange. Is there a case where routing through CDC saves enough in fees to make a rotation worthwhile even if you're not already there?`
+  };
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompts[type]}]})});
+    const data=await res.json();
+    if(data.error)throw new Error(data.error.message);
+    el.textContent=data.content?.map(b=>b.text||'').join('')||'No response';
+  }catch(e){el.textContent=`Error: ${e.message}`;}
+}
+
+// ══ CHART.JS & INIT ════════════════════════════════════════
+function loadChartJS(cb){if(window.Chart){cb();return;}const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';s.onload=cb;document.head.appendChild(s);}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  const hasSession=localStorage.getItem('cl_nW')!==null;
+  if(!hasSession)document.getElementById('setup-ov').classList.add('open');
+  updateWallets();
+  if(apiKey)document.getElementById('api-key').value=apiKey;
+  document.getElementById('t-act')?.addEventListener('change',feePreview);
+  loadChartJS(async()=>{
+    await refreshAll();
+    for(const coin of COINS.slice(0,4)){histories[coin.id]=await fetchHist(coin.id,30);await new Promise(r=>setTimeout(r,300));}
+    updateWallets();
+  });
+  setInterval(refreshAll,60000);
+});
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+</script>
+</body>
+</html>
